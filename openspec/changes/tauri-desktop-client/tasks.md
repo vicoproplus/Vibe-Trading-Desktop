@@ -36,10 +36,10 @@
 
 ## 5. Windows 差异适配(desktop-shell + bundling)【win】
 
-- [ ] 5.1 选定/制作 Windows x64 python-build-standalone 运行时并预装依赖(排除 weasyprint),跑 1.3 同款导入冒烟测试
+- [ ] 5.1 【阻塞:Windows 环境】选定/制作 Windows x64 python-build-standalone 运行时并预装依赖(排除 weasyprint),跑 1.3 同款导入冒烟测试
 - [x] 5.2 适配 Rust 侧:`python.exe` 路径、路径分隔符、spawn 细节
 - [x] 5.3 实现 Windows 进程清理:Job Object 关联子进程(或退出时 `taskkill /T`),验证关闭后无残留进程(含异常退出场景)
-- [ ] 5.4 编写 Windows 打包脚本,产出 `.msi`/`.exe` 并完成与 4.2–4.4 等价的端到端验证
+- [ ] 5.4 【阻塞:Windows 环境】编写 Windows 打包脚本,产出 `.msi`/`.exe` 并完成与 4.2–4.4 等价的端到端验证
 
 ## 6. 双平台构建与收尾
 
