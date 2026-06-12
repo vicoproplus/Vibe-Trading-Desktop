@@ -306,14 +306,14 @@ git commit -m "test(desktop): serve + health + backtest self-containment smoke"
 - Create: `src-tauri/src/main.rs`
 - Create: `src-tauri/icons/`(占位图标)
 
-- [ ] **Step 1: 确认 Rust/Tauri 工具链可用**
+- [x] **Step 1: 确认 Rust/Tauri 工具链可用**
 
 Run: `rustc --version && cargo --version`
 Expected: 均打印版本(无则先装 rustup)。
 Run: `cargo install tauri-cli --version "^2.0" || cargo tauri --version`
 Expected: `tauri-cli 2.x` 可用。
 
-- [ ] **Step 2: 写最小 tauri.conf.json(空壳,先不接 sidecar)**
+- [x] **Step 2: 写最小 tauri.conf.json(空壳,先不接 sidecar)**
 
 ```json
 {
@@ -338,7 +338,7 @@ Expected: `tauri-cli 2.x` 可用。
 
 说明:`frontendDist` 指向占位目录(本阶段不真用静态托管,后续 D1 用 webview 导航到后端);`placeholder-dist/` 放一个最小 `index.html` 让 cargo tauri 能构建。
 
-- [ ] **Step 3: 写最小 main.rs**
+- [x] **Step 3: 写最小 main.rs**
 
 ```rust
 // src-tauri/src/main.rs
@@ -351,7 +351,7 @@ fn main() {
 }
 ```
 
-- [ ] **Step 4: 写 Cargo.toml 与 build.rs,生成占位资源,构建空壳**
+- [x] **Step 4: 写 Cargo.toml 与 build.rs,生成占位资源,构建空壳**
 
 `src-tauri/Cargo.toml` 关键内容:
 ```toml
@@ -379,7 +379,7 @@ Run: `mkdir -p src-tauri/placeholder-dist && printf '<!doctype html><title>shell
 Run: `cd src-tauri && cargo build`
 Expected: 编译通过(占位图标缺失时按 `cargo tauri icon` 生成或放置占位 PNG/ICNS/ICO)。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add src-tauri/

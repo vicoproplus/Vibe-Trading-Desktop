@@ -13,7 +13,7 @@
 
 ## 2. Tauri 脚手架与项目结构【双】
 
-- [ ] 2.1 初始化 `src-tauri/`(Tauri 配置 + Rust crate + 图标占位),确认 Rust/Tauri 工具链可构建空壳应用
+- [x] 2.1 初始化 `src-tauri/`(Tauri 配置 + Rust crate + 图标占位),确认 Rust/Tauri 工具链可构建空壳应用
 - [ ] 2.2 编写 `tauri.conf.json`:窗口配置、`resources` 声明(Python 运行时目录、`agent/`、`frontend/dist`、`agent/.env`)、bundle 标识
 - [ ] 2.3 约定资源目录布局与 Rust 侧资源路径解析(开发态 vs 打包态),确保能定位内嵌 python 与 serve 入口
 
