@@ -393,7 +393,7 @@ git commit -m "feat(desktop): scaffold buildable Tauri 2 shell"
 - Modify: `src-tauri/src/main.rs`(挂模块 + 启动时打印解析结果)
 - Modify: `src-tauri/tauri.conf.json`(声明 `bundle.resources`)
 
-- [ ] **Step 1: 在 tauri.conf.json 声明资源装配**
+- [x] **Step 1: 在 tauri.conf.json 声明资源装配**
 
 在 `bundle` 加入(路径为构建时由装配脚本填充的相对目录,见阶段⑤):
 ```json
@@ -407,7 +407,7 @@ git commit -m "feat(desktop): scaffold buildable Tauri 2 shell"
 }
 ```
 
-- [ ] **Step 2: 写 resources.rs 解析内嵌资源根 + 关键子路径**
+- [x] **Step 2: 写 resources.rs 解析内嵌资源根 + 关键子路径**
 
 ```rust
 // src-tauri/src/resources.rs
@@ -445,7 +445,7 @@ impl Resources {
 }
 ```
 
-- [ ] **Step 3: 在 main.rs 的 setup 钩子里解析并打印(临时验证)**
+- [x] **Step 3: 在 main.rs 的 setup 钩子里解析并打印(临时验证)**
 
 ```rust
 // main.rs 内 Builder：
@@ -459,12 +459,12 @@ impl Resources {
 ```
 并在文件顶部加 `mod resources;`。
 
-- [ ] **Step 4: 构建并运行,确认路径解析(打包态稍后阶段⑤验证)**
+- [x] **Step 4: 构建并运行,确认路径解析(打包态稍后阶段⑤验证)**
 
 Run: `cd src-tauri && cargo build`
 Expected: 编译通过。打包态路径正确性留到阶段⑤随真实资源验证。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add src-tauri/src/resources.rs src-tauri/src/main.rs src-tauri/tauri.conf.json
