@@ -61,25 +61,23 @@ jobs:
         shell: bash
         env:
           PBS_TAG: '20260610'
+          ASSET_PATTERN: ${{ matrix.asset-pattern }}
         run: |
           set -euo pipefail
           echo "Fetching Python runtime for ${{ matrix.target }}..."
 
-          # Resolve the actual asset filename from the GitHub release
+          # Resolve the actual asset filename from the GitHub release API.
+          # Uses jq for reliable JSON parsing (pre-installed on both runners).
           RELEASE_URL="https://api.github.com/repos/astral-sh/python-build-standalone/releases/tags/${PBS_TAG}"
           echo "Querying release: $RELEASE_URL"
           ASSET_NAME=$(curl -fsSL "$RELEASE_URL" \
-            | python3 -c "
-      import json, sys, re
-      assets = json.load(sys.stdin).get('assets', [])
-      pattern = r'${{ matrix.asset-pattern }}'
-      for a in assets:
-          if re.match(pattern, a['name']):
-              print(a['name'])
-              sys.exit(0)
-      print('', file=sys.stderr)
-      sys.exit(1)
-      ")
+            | jq -r --arg pat "${ASSET_PATTERN}" \
+              '.assets[] | select(.name | test($pat)) | .name' \
+            | head -1)
+          if [ -z "$ASSET_NAME" ]; then
+            echo "ERROR: No asset matching ${ASSET_PATTERN} found in release ${PBS_TAG}"
+            exit 1
+          fi
           echo "Resolved asset: $ASSET_NAME"
           DOWNLOAD_URL="https://github.com/astral-sh/python-build-standalone/releases/download/${PBS_TAG}/${ASSET_NAME}"
 
