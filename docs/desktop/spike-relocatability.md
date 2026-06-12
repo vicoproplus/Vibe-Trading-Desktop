@@ -226,3 +226,38 @@ Bundle 中已确认不包含 weasyprint。这与 `install-deps.sh` 中 `grep -vi
 | Bundle 中 weasyprint 确认缺失 | PASS |
 | 报告 HTML 始终产出 | PASS |
 | 无需代码修改 | PASS |
+
+## 回归验证 (Task 21)
+
+> 日期：2026-06-12，验证桌面模式不破坏现有用法。
+
+| 验证项 | 方法 | 结果 |
+|---|---|---|
+| `vibe-trading serve` 入口完整 | `PYTHONPATH=agent python3 -c "import cli, inspect; print(inspect.signature(cli.main))"` | PASS -- `cli.main(argv: Optional[list[str]] = None) -> int` |
+| Docker 相关文件未修改 | `git diff --stat main -- agent/ frontend/` (feature 分支、无差异) | PASS -- agent/ 与 frontend/ 相对 main 无改动 |
+| `.gitignore` 包含桌面产物 | `grep -E 'desktop-build\|src-tauri/target' .gitignore` | PASS -- `src-tauri/target/` (L95) + `.desktop-build/` (L96) 均已存在 |
+
+## 已知限制汇总 (Task 22)
+
+> 日期：2026-06-12，发布说明与用户文档交叉引用。
+
+| 限制 | 影响 | 缓解措施 |
+|---|---|---|
+| **未签名** | macOS 右键打开，Windows SmartScreen 警告 | 文档说明操作步骤 |
+| **体积 ~800MB** | 下载/安装/磁盘占用大 | 内嵌完整 Python 运行时 + 178 依赖的必然代价 |
+| **PDF 报告降级 HTML** | 影子账户报告无 PDF 输出 | 合理降级 -- weasyprint ~200MB 打包不划算；HTML 报告功能完整 |
+| **无自动更新** | 用户需手动下载新版本 | 后续里程碑可引入 Tauri updater |
+| **仅限 127.0.0.1** | 无法从其他设备访问桌面应用 | 安全设计选择 -- 桌面应用不需要外部可达 |
+| **macOS Apple Silicon only** | Intel Mac 用户无法使用 CI 产物 | x64 交叉编译成本高，CI 未覆盖 |
+| **无代码签名证书** | 分发渠道受限，无法上架 App Store | 后续可申请 Apple Developer Program + Windows 代码签名证书 |
+
+### 产物体积明细（参考）
+
+| 组件 | 大小 | 占比 |
+|---|---|---|
+| Python 运行时 (3.12.13 + 178 包) | 728M | 92% |
+| agent 代码模板 | 7.5M | 1% |
+| frontend/dist (SPA) | 1.6M | <1% |
+| DMG 安装包 (macOS) | 229M | 压缩后 ~31% |
+| **合计 (资源包)** | **~737M** | 100% |
+
