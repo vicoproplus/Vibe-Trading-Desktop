@@ -97,3 +97,61 @@ pub fn await_health(child: &mut Child, port: u16) -> Ready {
 pub fn health_url(port: u16) -> String {
     format!("http://127.0.0.1:{port}/health")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    #[test]
+    fn spawn_command_has_expected_args() {
+        let python = Path::new("/fake/python3");
+        let agent = Path::new("/fake/agent");
+        let cmd = build_cmd(python, agent, 8899);
+
+        // Verify the program path is set correctly
+        assert_eq!(cmd.get_program(), "/fake/python3");
+
+        // Verify key env vars via iterator (get_envs returns HashMap<&OsStr, Option<&OsStr>>)
+        let mut found_pythonpath = false;
+        let mut found_bytecode = false;
+        for (key, val) in cmd.get_envs() {
+            let k = key.to_str().unwrap_or("");
+            let v = val.and_then(|v| v.to_str()).unwrap_or("");
+            if k == "PYTHONPATH" && v == "/fake/agent" {
+                found_pythonpath = true;
+            }
+            if k == "PYTHONDONTWRITEBYTECODE" && v == "1" {
+                found_bytecode = true;
+            }
+        }
+        assert!(found_pythonpath, "PYTHONPATH not set correctly");
+        assert!(found_bytecode, "PYTHONDONTWRITEBYTECODE not set correctly");
+    }
+
+    #[test]
+    fn boot_const_is_valid() {
+        // BOOT is the -c argument for Python, which imports cli and calls cli.main
+        assert!(BOOT.contains("cli.main"));
+        assert!(BOOT.contains("import"));
+    }
+
+    #[test]
+    fn build_cmd_includes_serve_args() {
+        let python = Path::new("/fake/python3");
+        let agent = Path::new("/fake/agent");
+        let cmd = build_cmd(python, agent, 8899);
+
+        let args: Vec<&str> = cmd.get_args().map(|a| a.to_str().unwrap()).collect();
+        let args_str = args.join(" ");
+        assert!(args_str.contains("serve"), "expected 'serve' in args: {}", args_str);
+        assert!(args_str.contains("127.0.0.1"), "expected '127.0.0.1' in args: {}", args_str);
+        assert!(args_str.contains("8899"), "expected '8899' in args: {}", args_str);
+    }
+
+    #[test]
+    fn health_url_formats_correctly() {
+        assert_eq!(health_url(8899), "http://127.0.0.1:8899/health");
+        assert_eq!(health_url(3000), "http://127.0.0.1:3000/health");
+    }
+}
