@@ -1138,23 +1138,23 @@ git commit -m "build(desktop): assemble + trim resources (no data dirs, no pycac
 **Files:**
 - Modify: `src-tauri/tauri.conf.json`(确认 `resources` 路径与装配产物一致)
 
-- [ ] **Step 1: 打包 .app**
+- [x] **Step 1: 打包 .app**
 
 Run: `cd src-tauri && cargo tauri build --bundles app`
 Expected: 产出 `src-tauri/target/release/bundle/macos/Vibe Trading.app`。
 
-- [ ] **Step 2: 在无项目 venv 的环境双击启动,走完整时序**
+- [x] **Step 2: 在无项目 venv 的环境双击启动,走完整时序**
 
 把 `.app` 拷到 `/Applications` 或临时目录,双击。观察:loading 页秒开 → 准备目录 → 健康通过 → webview 跳转后端 UI。
 Run(确认用的是内嵌 Python 而非系统):`ps -eo command | grep "[V]ibe Trading.app" | grep python` 应指向 `.app/Contents/Resources/python-runtime/bin/python3`。
 Expected: UI 正常加载,可发起一次对话、跑一次最小回测(验证 `runner.py:160` 回退到内嵌解释器)。
 
-- [ ] **Step 3: 验证家目录状态(spec desktop-shell 首启场景)**
+- [x] **Step 3: 验证家目录状态(spec desktop-shell 首启场景)**
 
 Run: `ls -la ~/.vibe-trading/runtime/agent && cat ~/.vibe-trading/runtime/.installed_version && ls ~/.vibe-trading/.env`
 Expected: `runtime/agent` 含代码;`.installed_version` 等于 bundle VERSION;`~/.vibe-trading/.env` 存在(首启种入)。重启应用后 `runs/sessions` 数据仍在。
 
-- [ ] **Step 4: 记录端到端结论,提交**
+- [x] **Step 4: 记录端到端结论,提交**
 
 ```bash
 git add -A
