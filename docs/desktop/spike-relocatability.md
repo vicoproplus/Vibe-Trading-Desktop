@@ -21,7 +21,25 @@ bash scripts/desktop/fetch-runtime.sh
 
 ## 依赖安装
 
-> 待 Task 2 完成后填写。
+**安装命令:**
+```bash
+bash scripts/desktop/install-deps.sh ./.desktop-build/python-runtime
+```
+
+**安装方式:** 使用 `uv pip install`(uv 0.9.26)直接从 `agent/requirements.txt` 安装，通过 `grep -viE '^\s*weasyprint'` 过滤掉 weasyprint 行。共解析 178 个包，实际安装 178 个包（含传递依赖）。
+
+**安装耗时:** 约 8.6 秒（wall time），含下载 94 个预编译 wheel + 3 个源码构建（ta、asyncio-nats-client、jsonpath）。
+
+**site-packages 体积:** 739 MB（含所有原生扩展如 numpy、scipy、duckdb、matplotlib 等）。
+
+**验证:**
+```bash
+# 确认 weasyprint 未被安装
+./.desktop-build/python-runtime/bin/python3 -m pip show weasyprint || echo "weasyprint absent (OK)"
+# 输出: weasyprint absent (OK)
+```
+
+**过滤后的 requirements 内容:** 除 `weasyprint>=60.0` 被排除外，其余所有行（rich、pyyaml、langchain、pandas、numpy、scipy、duckdb、fastapi、uvicorn、fastmcp、ccxt 等）均正常安装。
 
 ## 冒烟结论
 
