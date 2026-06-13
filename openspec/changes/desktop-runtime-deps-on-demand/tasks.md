@@ -31,12 +31,12 @@
 - [x] 4.5 实现 `POST /optional-deps/uninstall`
 - [x] 4.6 实现安装进度反馈：SSE 推送子进程 stdout / 阶段状态（复用 `sse-starlette`）
 - [x] 4.7 实现镜像源配置读写端点（`GET/PUT /optional-deps/mirror`），持久化到用户配置
-- [ ] 4.8 将 `/optional-deps` 路由组挂载到 `agent/api_server.py`
+- [x] 4.8 将 `/optional-deps` 路由组挂载到 `agent/api_server.py`
 
 ## 5. 国内镜像注入
 
-- [ ] 5.1 `sidecar.rs` spawn 时按用户配置注入 `PIP_INDEX_URL` / `UV_INDEX_URL`（及 `*_EXTRA_INDEX_URL`），默认清华源
-- [ ] 5.2 镜像配置持久化与读取（写入 `~/.vibe-trading/.env` 或独立配置文件）
+- [x] 5.1 `sidecar.rs` spawn 时按用户配置注入 `PIP_INDEX_URL` / `UV_INDEX_URL`（及 `*_EXTRA_INDEX_URL`），默认清华源
+- [x] 5.2 镜像配置持久化与读取（写入 `~/.vibe-trading/.env` 或独立配置文件）
 
 ## 6. 前端设置页 UI
 

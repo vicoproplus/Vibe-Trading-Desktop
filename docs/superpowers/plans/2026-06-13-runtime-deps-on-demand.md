@@ -2011,7 +2011,7 @@ git commit -s -m "feat(optional-deps): FastAPI router with list/install/uninstal
 **Files:**
 - Modify: `agent/api_server.py`（在 swarm 路由块之后、文件末尾前）
 
-- [ ] **Step 1：写失败测试 — /optional-deps/list 通过主 app 可达**
+- [x] **Step 1：写失败测试 — /optional-deps/list 通过主 app 可达**
 
 新建 `agent/tests/test_api_server_optional_deps.py`：
 
@@ -2035,12 +2035,12 @@ def test_optional_deps_list_mounted():
     assert isinstance(body["brokers"], list)
 ```
 
-- [ ] **Step 2：运行测试确认失败**
+- [x] **Step 2：运行测试确认失败**
 
 Run: `cd agent && python -m pytest tests/test_api_server_optional_deps.py -q`
 Expected: FAIL — 404（路由未挂载）。
 
-- [ ] **Step 3：在 api_server.py 挂载路由**
+- [x] **Step 3：在 api_server.py 挂载路由**
 
 在 `agent/api_server.py` 的 swarm retry 路由之后（约 Task 看到的 live-trading 注释块之前），插入：
 
@@ -2058,17 +2058,17 @@ app.include_router(
 )
 ```
 
-- [ ] **Step 4：运行测试确认通过**
+- [x] **Step 4：运行测试确认通过**
 
 Run: `cd agent && python -m pytest tests/test_api_server_optional_deps.py -q`
 Expected: PASS。
 
-- [ ] **Step 5：语法检查**
+- [x] **Step 5：语法检查**
 
 Run: `cd agent && python -m py_compile api_server.py`
 Expected: 无输出。
 
-- [ ] **Step 6：提交**
+- [x] **Step 6：提交**
 
 ```bash
 git add agent/api_server.py agent/tests/test_api_server_optional_deps.py
@@ -2083,7 +2083,7 @@ git commit -s -m "feat(api): mount /optional-deps router on api_server app"
 - Modify: `src-tauri/src/sidecar.rs`（`build_cmd` 追加镜像 env）
 - Modify: `src-tauri/src/sidecar.rs`（测试）
 
-- [ ] **Step 1：写失败测试 — build_cmd 默认注入清华 PIP_INDEX_URL**
+- [x] **Step 1：写失败测试 — build_cmd 默认注入清华 PIP_INDEX_URL**
 
 在 `src-tauri/src/sidecar.rs` 的 `tests` 模块追加：
 
@@ -2114,12 +2114,12 @@ git commit -s -m "feat(api): mount /optional-deps router on api_server app"
     }
 ```
 
-- [ ] **Step 2：运行测试确认失败**
+- [x] **Step 2：运行测试确认失败**
 
 Run: `cd src-tauri && cargo test --lib sidecar::tests::build_cmd_injects_default_pip_mirror`
 Expected: FAIL（`PIP_INDEX_URL` 未设置）。
 
-- [ ] **Step 3：build_cmd 注入 PIP_INDEX_URL / PIP_TRUSTED_HOST**
+- [x] **Step 3：build_cmd 注入 PIP_INDEX_URL / PIP_TRUSTED_HOST**
 
 在 `src-tauri/src/sidecar.rs` 的 `build_cmd` 中，`.env("VIBE_RUNTIME_LIBS", runtime_libs)` 之后追加：
 
@@ -2137,12 +2137,12 @@ Expected: FAIL（`PIP_INDEX_URL` 未设置）。
 
 不设置 `PIP_TRUSTED_HOST`（清华源是 HTTPS，无需 trusted-host；测试断言其为 `None`）。
 
-- [ ] **Step 4：运行测试确认通过**
+- [x] **Step 4：运行测试确认通过**
 
 Run: `cd src-tauri && cargo test --lib sidecar`
 Expected: PASS。
 
-- [ ] **Step 5：提交**
+- [x] **Step 5：提交**
 
 ```bash
 git add src-tauri/src/sidecar.rs
