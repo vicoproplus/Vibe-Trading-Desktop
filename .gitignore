@@ -99,3 +99,4 @@ src-tauri/target/
 # Codegraph index
 .codegraph/
 .comet
+.idea
