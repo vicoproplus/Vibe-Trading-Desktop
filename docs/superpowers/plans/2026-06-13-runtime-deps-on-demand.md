@@ -810,7 +810,7 @@ git commit -s -m "feat(optional-deps): registry yaml + loader with whitelist val
 - Create: `agent/src/optional_deps/platform.py`
 - Test: `agent/src/optional_deps/tests/test_platform.py`
 
-- [ ] **Step 1：写失败测试 — 当前平台标签与预检**
+- [x] **Step 1：写失败测试 — 当前平台标签与预检**
 
 新建 `agent/src/optional_deps/tests/test_platform.py`：
 
@@ -853,12 +853,12 @@ def test_supported_when_no_platform_listed(monkeypatch):
     assert is_supported_on_current_platform([]) is True
 ```
 
-- [ ] **Step 2：运行测试确认失败**
+- [x] **Step 2：运行测试确认失败**
 
 Run: `cd agent && python -m pytest src/optional_deps/tests/test_platform.py -q`
 Expected: FAIL — `ModuleNotFoundError`。
 
-- [ ] **Step 3：实现 platform.py**
+- [x] **Step 3：实现 platform.py**
 
 新建 `agent/src/optional_deps/platform.py`：
 
@@ -913,12 +913,12 @@ def is_supported_on_current_platform(supported: Iterable[str]) -> bool:
     return current_platform_tag() in tags
 ```
 
-- [ ] **Step 4：运行测试确认通过**
+- [x] **Step 4：运行测试确认通过**
 
 Run: `cd agent && python -m pytest src/optional_deps/tests/test_platform.py -q`
 Expected: PASS（4 个测试）。
 
-- [ ] **Step 5：提交**
+- [x] **Step 5：提交**
 
 ```bash
 git add agent/src/optional_deps/platform.py agent/src/optional_deps/tests/test_platform.py
@@ -933,7 +933,7 @@ git commit -s -m "feat(optional-deps): platform tag detection + wheel pre-check"
 - Create: `agent/src/optional_deps/mirror.py`
 - Test: `agent/src/optional_deps/tests/test_mirror.py`
 
-- [ ] **Step 1：写失败测试 — 镜像读写与默认值**
+- [x] **Step 1：写失败测试 — 镜像读写与默认值**
 
 新建 `agent/src/optional_deps/tests/test_mirror.py`：
 
@@ -998,12 +998,12 @@ def test_resolve_index_url_custom_uses_custom_url():
     assert resolve_index_url(cfg) == "https://x/simple"
 ```
 
-- [ ] **Step 2：运行测试确认失败**
+- [x] **Step 2：运行测试确认失败**
 
 Run: `cd agent && python -m pytest src/optional_deps/tests/test_mirror.py -q`
 Expected: FAIL — `ModuleNotFoundError`。
 
-- [ ] **Step 3：实现 mirror.py**
+- [x] **Step 3：实现 mirror.py**
 
 新建 `agent/src/optional_deps/mirror.py`：
 
@@ -1108,12 +1108,12 @@ def resolve_trusted_host(config: MirrorConfig) -> str:
     return bare
 ```
 
-- [ ] **Step 4：运行测试确认通过**
+- [x] **Step 4：运行测试确认通过**
 
 Run: `cd agent && python -m pytest src/optional_deps/tests/test_mirror.py -q`
 Expected: PASS（6 个测试）。
 
-- [ ] **Step 5：提交**
+- [x] **Step 5：提交**
 
 ```bash
 git add agent/src/optional_deps/mirror.py agent/src/optional_deps/tests/test_mirror.py
