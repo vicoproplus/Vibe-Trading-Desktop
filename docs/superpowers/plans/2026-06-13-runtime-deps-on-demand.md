@@ -2270,7 +2270,7 @@ git commit -s -m "feat(frontend): proxy /optional-deps to the backend"
 - Create: `frontend/src/components/settings/OptionalDepsManager.tsx`
 - Modify: `frontend/src/pages/Settings.tsx`（挂载组件）
 
-- [ ] **Step 1：创建组件文件**
+- [x] **Step 1：创建组件文件**
 
 新建目录与文件 `frontend/src/components/settings/OptionalDepsManager.tsx`：
 
@@ -2531,7 +2531,7 @@ export function OptionalDepsManager() {
 }
 ```
 
-- [ ] **Step 2：在 Settings.tsx 挂载组件**
+- [x] **Step 2：在 Settings.tsx 挂载组件**
 
 在 `frontend/src/pages/Settings.tsx` 顶部 import 区追加：
 
@@ -2556,12 +2556,12 @@ import { OptionalDepsManager } from "@/components/settings/OptionalDepsManager";
 
 注意：若 `Settings.tsx` 顶部未 import `Package`，从 `lucide-react` 的 import 列表中追加 `Package`（若已存在则跳过）。
 
-- [ ] **Step 3：类型检查 + 构建**
+- [x] **Step 3：类型检查 + 构建**
 
 Run: `cd frontend && npx tsc -b && npm run build`
 Expected: 无类型错误，构建成功。
 
-- [ ] **Step 4：提交**
+- [x] **Step 4：提交**
 
 ```bash
 git add frontend/src/components/settings/OptionalDepsManager.tsx frontend/src/pages/Settings.tsx
