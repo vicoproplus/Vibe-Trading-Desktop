@@ -14,28 +14,68 @@ pub struct Resources {
 
 impl Resources {
     pub fn resolve(app: &AppHandle) -> Result<Self, String> {
-        let base = app
-            .path()
-            .resource_dir()
-            .map_err(|e| format!("resource_dir unavailable: {e}"))?;
-        let py = if cfg!(windows) {
-            base.join("python-runtime").join("python.exe")
-        } else {
-            base.join("python-runtime").join("bin").join("python3")
-        };
-        Ok(Self {
-            runtime_python: py,
-            agent_template: base.join("agent"),
-            env_seed: base.join("agent").join(".env"),
-            loading_html: base.join("loading.html"),
-            version_file: base.join("VERSION"),
-            frontend_dist: base.join("frontend").join("dist"),
-        })
+        let base = resolve_base(app)?;
+        let mut res = resolve_from_base(&base);
+        // dev: loading.html 位于源码目录(src-tauri/src)，而非 .desktop-build
+        #[cfg(debug_assertions)]
+        {
+            res.loading_html =
+                PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src").join("loading.html");
+        }
+        Ok(res)
     }
 }
 
-/// 从给定 base 目录解析资源路径(用于单元测试，不依赖 AppHandle)。
-#[allow(dead_code)]
+/// 解析资源根目录。
+///
+/// - **release / 打包态**：使用打包内嵌的 `resource_dir()`（.app/Contents/Resources 等）。
+/// - **dev 态（`cargo tauri dev`）**：直接使用仓库 `.desktop-build/`——dev 时
+///   `resource_dir()` 指向 `target/debug/`，那里的资源副本陈旧/损坏（python 运行时
+///   被 SIGKILL），会导致 sidecar 启动即死、后端完全无效。
+///
+/// dev 回退由 `#[cfg(debug_assertions)]` 编译期门控：**release 构建不编译此分支**，
+/// 因此正式构建的资源解析路径与定位逐字节不变。
+fn resolve_base(app: &AppHandle) -> Result<PathBuf, String> {
+    #[cfg(not(debug_assertions))]
+    {
+        app.path()
+            .resource_dir()
+            .map_err(|e| format!("resource_dir unavailable: {e}"))
+    }
+    #[cfg(debug_assertions)]
+    {
+        let _ = app; // dev 分支不依赖 AppHandle
+        dev_build_base()
+    }
+}
+
+/// dev 专用：解析到仓库 `.desktop-build/` 并校验 python-runtime / agent 就绪。
+/// 抽取为独立纯函数便于单元测试。
+#[cfg(debug_assertions)]
+fn dev_build_base() -> Result<PathBuf, String> {
+    let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let repo = manifest
+        .parent()
+        .ok_or("无法从 CARGO_MANIFEST_DIR 解析仓库根目录")?;
+    let build = repo.join(".desktop-build");
+    let py = if cfg!(windows) {
+        build.join("python-runtime").join("python.exe")
+    } else {
+        build.join("python-runtime").join("bin").join("python3")
+    };
+    if py.exists() && build.join("agent").exists() {
+        Ok(build)
+    } else {
+        Err(format!(
+            "dev 模式资源缺失：未在 {build:?} 找到可用的 python-runtime / agent。\n\
+             请先执行组装脚本：\n  bash scripts/desktop/fetch-runtime.sh\n  \
+             bash scripts/desktop/install-deps.sh .desktop-build/python-runtime\n  \
+             bash scripts/desktop/assemble.sh"
+        ))
+    }
+}
+
+/// 从给定 base 目录解析资源路径（resolve 与单元测试共享的构建器）。
 pub fn resolve_from_base(base: &std::path::Path) -> Resources {
     let py = if cfg!(windows) {
         base.join("python-runtime").join("python.exe")
@@ -118,5 +158,19 @@ mod tests {
         assert!(res.env_seed.starts_with(base));
         assert!(res.loading_html.starts_with(base));
         assert!(res.version_file.starts_with(base));
+    }
+
+    // dev 回退测试：仅在 debug 构建编译运行（cargo test 默认 debug）。
+    // .desktop-build 已组装时应解析到该目录；CI/全新克隆未组装时跳过（返回 Err）。
+    #[cfg(debug_assertions)]
+    #[test]
+    fn dev_build_base_resolves_to_desktop_build_when_present() {
+        match dev_build_base() {
+            Ok(p) => assert!(
+                p.ends_with(".desktop-build"),
+                "expected path ending in .desktop-build, got {p:?}"
+            ),
+            Err(_) => { /* .desktop-build 未组装（CI/全新克隆），跳过 */ }
+        }
     }
 }
