@@ -2156,7 +2156,7 @@ git commit -s -m "feat(desktop): inject default PIP_INDEX_URL (tsinghua) into si
 **Files:**
 - Modify: `frontend/src/lib/api.ts`（新增类型 + `optionalDeps.*` 方法）
 
-- [ ] **Step 1：在 api.ts 新增类型定义**
+- [x] **Step 1：在 api.ts 新增类型定义**
 
 在 `frontend/src/lib/api.ts` 的类型区（与其他 interface 同段，例如 `LiveStatus` 之后）追加：
 
@@ -2188,7 +2188,7 @@ export interface UpdateMirrorRequest {
 }
 ```
 
-- [ ] **Step 2：在 api 对象新增方法**
+- [x] **Step 2：在 api 对象新增方法**
 
 在 `frontend/src/lib/api.ts` 的 `api` 对象中（`stopLiveRunner` 之后、闭合 `};` 之前）追加：
 
@@ -2217,7 +2217,7 @@ export interface UpdateMirrorRequest {
     }),
 ```
 
-- [ ] **Step 3：类型检查**
+- [x] **Step 3：类型检查**
 
 Run: `cd frontend && npx tsc -b`
 Expected: 无错误（类型在后续 Task 14 使用，此处仅声明）。
@@ -2236,7 +2236,7 @@ git commit -s -m "feat(frontend): add optional-deps api methods and types"
 **Files:**
 - Modify: `frontend/vite.config.ts:6-15`（`PROXY_PATHS` 数组）
 
-- [ ] **Step 1：修改 PROXY_PATHS**
+- [x] **Step 1：修改 PROXY_PATHS**
 
 在 `frontend/vite.config.ts` 的 `PROXY_PATHS` 数组中追加 `"/optional-deps"`：
 
@@ -2255,7 +2255,7 @@ const PROXY_PATHS = [
 ];
 ```
 
-- [ ] **Step 2：提交**
+- [x] **Step 2：提交**
 
 ```bash
 git add frontend/vite.config.ts
