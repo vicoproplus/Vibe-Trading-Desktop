@@ -2698,32 +2698,32 @@ git commit -s -m "test(optional-deps): integration test install→import full ch
 
 **Files:** 无（仅运行）
 
-- [ ] **Step 1：后端全部单元测试**
+- [x] **Step 1：后端全部单元测试**
 
 Run: `cd agent && python -m pytest src/optional_deps/tests/ tests/test_cli_runtime_libs.py tests/test_api_server_optional_deps.py -q`
 Expected: 全部 PASS。
 
-- [ ] **Step 2：Ruff lint**
+- [x] **Step 2：Ruff lint**
 
 Run: `cd agent && ruff check src/optional_deps/ cli/main.py tests/test_cli_runtime_libs.py tests/test_api_server_optional_deps.py tests/test_optional_deps_integration.py`
 Expected: 无错误（E501 已忽略，line-length 120）。
 
-- [ ] **Step 3：Python 语法检查入口文件**
+- [x] **Step 3：Python 语法检查入口文件**
 
 Run: `cd agent && python -m py_compile api_server.py cli/main.py`
 Expected: 无输出。
 
-- [ ] **Step 4：Rust 测试**
+- [x] **Step 4：Rust 测试**
 
 Run: `cd src-tauri && cargo test`
 Expected: 全部 PASS（runtime_dir、sidecar 新测试 + 既有测试）。
 
-- [ ] **Step 5：前端类型检查 + 构建 + 单测**
+- [x] **Step 5：前端类型检查 + 构建 + 单测**
 
 Run: `cd frontend && npx tsc -b && npm run build && npx vitest run`
 Expected: 无类型错误，构建成功，vitest 全绿。
 
-- [ ] **Step 6：提交（如有 lint 修复）**
+- [x] **Step 6：提交（如有 lint 修复）**
 
 ```bash
 git add -A
