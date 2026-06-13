@@ -19,18 +19,45 @@ hits :func:`main`.
 
 from __future__ import annotations
 
-import importlib
 import os
 import sys
-import threading
-import time
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
 
-from cli.intro import print_banner
-from cli.onboard import run_onboarding
-from cli.theme import Theme, get_console
+# ---------------------------------------------------------------------------
+# Optional-deps runtime libs: append the writable libs dir to sys.path.
+# This MUST run before any business import so packages installed into
+# ~/.vibe-trading/runtime/libs/ (by the optional-deps installer) are
+# importable. ``append`` (not insert) keeps bundle site-packages FIRST,
+# so a same-named package in libs never shadows a core bundled dependency.
+# 封装为函数以便单测；模块级立即调用以保证在业务 import 之前生效。
+# ---------------------------------------------------------------------------
+
+
+def _apply_runtime_libs_path() -> None:
+    """Append ``$VIBE_RUNTIME_LIBS`` to ``sys.path`` if it points at a real dir.
+
+    Sidecar (src-tauri/sidecar.rs) sets ``VIBE_RUNTIME_LIBS`` to the writable
+    ``~/.vibe-trading/runtime/libs`` dir. We append (not insert) so this dir
+    lands AFTER the bundle's bundled ``site-packages`` — core dependencies
+    always win, a same-named package in libs can only ADD a missing module,
+    never override a core one. Empty/unset/non-dir values are silently skipped.
+    """
+    libs_dir = os.environ.get("VIBE_RUNTIME_LIBS")
+    if libs_dir and Path(libs_dir).is_dir():
+        sys.path.append(libs_dir)
+
+
+_apply_runtime_libs_path()
+
+import importlib  # noqa: E402
+import threading  # noqa: E402
+import time  # noqa: E402
+from dataclasses import dataclass, field  # noqa: E402
+from typing import Any, Dict, List, Optional, Sequence  # noqa: E402
+
+from cli.intro import print_banner  # noqa: E402
+from cli.onboard import run_onboarding  # noqa: E402
+from cli.theme import Theme, get_console  # noqa: E402
 
 
 def _register_live_slash_commands() -> None:
