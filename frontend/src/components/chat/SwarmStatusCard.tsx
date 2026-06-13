@@ -9,6 +9,7 @@ import {
   Users,
   XCircle,
 } from "lucide-react";
+import { useI18n } from "@/i18n";
 import { ProgressBar } from "@/components/chat/ProgressBar";
 import { localizeToolName } from "@/lib/tools";
 import type { SwarmAgentDisplayStatus, SwarmRunStatus } from "@/types/agent";
@@ -83,6 +84,7 @@ function runTone(status: SwarmRunStatus["status"]): string {
 }
 
 export const SwarmStatusCard = memo(function SwarmStatusCard({ status }: Props) {
+  const { t } = useI18n();
   const done = status.agents.filter((agent) => ["done", "failed", "blocked", "cancelled"].includes(agent.status)).length;
   const total = status.agents.length;
   const layerTotal = Math.max(status.totalLayers, status.currentLayer + 1, 1);
@@ -103,7 +105,7 @@ export const SwarmStatusCard = memo(function SwarmStatusCard({ status }: Props) 
           </div>
           <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
             <Clock className="h-3 w-3" />
-            <span>{done}/{total || 0} agents</span>
+            <span>{t("chat.swarm.agents", { done, total: total || 0 })}</span>
           </div>
         </div>
 
@@ -113,22 +115,22 @@ export const SwarmStatusCard = memo(function SwarmStatusCard({ status }: Props) 
             total={Math.max(total, 1)}
             height="xs"
             showCount
-            ariaLabel="Swarm agent progress"
+            ariaLabel={t("chat.swarm.progress")}
           />
           <div className="text-right font-mono text-[11px] text-muted-foreground">
-            Layer {layerCurrent}/{layerTotal}
+            {t("chat.swarm.layer", { current: layerCurrent, total: layerTotal })}
           </div>
         </div>
 
         <div className="mt-3 overflow-x-auto">
           <div className="min-w-[620px]">
             <div className="grid grid-cols-[10rem_7rem_9rem_5rem_4rem_minmax(0,1fr)] gap-2 border-b pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-              <span>Agent</span>
-              <span>Status</span>
-              <span>Tool</span>
-              <span className="text-right">Time</span>
-              <span className="text-right">Iters</span>
-              <span>Output</span>
+              <span>{t("chat.swarm.agent")}</span>
+              <span>{t("chat.swarm.status")}</span>
+              <span>{t("chat.swarm.tool")}</span>
+              <span className="text-right">{t("chat.swarm.time")}</span>
+              <span className="text-right">{t("chat.swarm.iters")}</span>
+              <span>{t("chat.swarm.output")}</span>
             </div>
             <div className="divide-y">
               {status.agents.map((agent) => (
@@ -162,7 +164,7 @@ export const SwarmStatusCard = memo(function SwarmStatusCard({ status }: Props) 
               ))}
               {status.agents.length === 0 && (
                 <div className="py-3 text-xs text-muted-foreground">
-                  Waiting for agent events...
+                  {t("chat.swarm.waiting")}
                 </div>
               )}
             </div>

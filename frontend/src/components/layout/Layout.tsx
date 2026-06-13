@@ -14,9 +14,11 @@ import {
   Settings,
   Layers,
   Loader2,
+  Languages,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { useI18n } from "@/i18n";
 import { api, type SessionItem } from "@/lib/api";
 import { useAgentStore } from "@/stores/agent";
 import { ConnectionBanner } from "@/components/layout/ConnectionBanner";
@@ -25,17 +27,18 @@ import { ConnectionBanner } from "@/components/layout/ConnectionBanner";
 const APP_VERSION = "v0.1.9";
 
 const NAV = [
-  { to: "/", icon: BarChart3, label: "Home" },
-  { to: "/agent", icon: Bot, label: "Agent" },
-  { to: "/alpha-zoo", icon: Layers, label: "Alpha Zoo" },
-  { to: "/settings", icon: Settings, label: "Settings" },
-  { to: "/correlation", icon: BarChart3, label: "Correlation Matrix" },
+  { to: "/", icon: BarChart3, labelKey: "nav.home" as const },
+  { to: "/agent", icon: Bot, labelKey: "nav.agent" as const },
+  { to: "/alpha-zoo", icon: Layers, labelKey: "nav.alphaZoo" as const },
+  { to: "/settings", icon: Settings, labelKey: "nav.settings" as const },
+  { to: "/correlation", icon: BarChart3, labelKey: "nav.correlation" as const },
 ];
 
 export function Layout() {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const { dark, toggle } = useDarkMode();
+  const { t, lang, setLang } = useI18n();
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const sseStatus = useAgentStore((s) => s.sseStatus);
@@ -128,8 +131,7 @@ export function Layout() {
 
         {/* Nav */}
         <nav className={cn("space-y-0.5", collapsed ? "p-1" : "p-2")}>
-          {NAV.map(({ to, icon: Icon, label }) => {
-            const text = label;
+          {NAV.map(({ to, icon: Icon, labelKey }) => {
             return (
               <Link
                 key={to}
@@ -141,10 +143,10 @@ export function Layout() {
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
-                title={collapsed ? text : undefined}
+                title={collapsed ? t(labelKey) : undefined}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                {!collapsed && text}
+                {!collapsed && t(labelKey)}
               </Link>
             );
           })}
@@ -156,12 +158,12 @@ export function Layout() {
             <div className="flex items-center justify-between px-4 py-2">
               <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                 <MessageSquare className="h-3.5 w-3.5" />
-                Sessions
+                {t("layout.sessions")}
               </span>
               <Link
                 to="/agent"
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                title="New Chat"
+                title={t("layout.newChat")}
               >
                 <Plus className="h-3.5 w-3.5" />
               </Link>
@@ -179,7 +181,7 @@ export function Layout() {
                 </div>
               ) : sessions.length === 0 ? (
                 <p className="px-3 py-2 text-xs text-muted-foreground/60">
-                  No sessions yet
+                  {t("layout.noSessions")}
                 </p>
               ) : null}
               {sessions.map((s) => {
@@ -237,13 +239,13 @@ export function Layout() {
                           onClick={() => deleteSession(s.session_id)}
                           className="p-1 text-danger hover:bg-danger/10 rounded text-[10px] font-medium"
                         >
-                          Confirm
+                          {t("common.confirm")}
                         </button>
                         <button
                           onClick={() => setDeleteTarget(null)}
                           className="p-1 text-muted-foreground hover:bg-muted rounded text-[10px]"
                         >
-                          Cancel
+                          {t("common.cancel")}
                         </button>
                       </div>
                     ) : !isRenaming ? (
@@ -256,7 +258,7 @@ export function Layout() {
                             setRenameValue(s.title || "");
                           }}
                           className="p-1 text-muted-foreground hover:text-foreground rounded"
-                          title="Rename"
+                          title={t("common.rename")}
                         >
                           <Pencil className="h-3 w-3" />
                         </button>
@@ -267,7 +269,7 @@ export function Layout() {
                             setDeleteTarget(s.session_id);
                           }}
                           className="p-1 text-muted-foreground hover:text-danger rounded"
-                          title="Delete?"
+                          title={t("common.delete")}
                         >
                           <Trash2 className="h-3 w-3" />
                         </button>
@@ -295,7 +297,7 @@ export function Layout() {
               <button
                 onClick={toggle}
                 className="p-1.5 text-muted-foreground hover:text-foreground rounded transition-colors"
-                title={dark ? "Light" : "Dark"}
+                title={dark ? t("layout.light") : t("layout.dark")}
               >
                 {dark ? (
                   <Sun className="h-3.5 w-3.5" />
@@ -304,9 +306,16 @@ export function Layout() {
                 )}
               </button>
               <button
+                onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+                className="p-1.5 text-muted-foreground hover:text-foreground rounded transition-colors"
+                title={lang === "zh" ? t("layout.switchToEn") : t("layout.switchToZh")}
+              >
+                <span className="text-xs font-medium">{lang === "zh" ? "EN" : "中"}</span>
+              </button>
+              <button
                 onClick={() => setCollapsed(false)}
                 className="p-1.5 text-muted-foreground hover:text-foreground rounded transition-colors"
-                title="Expand"
+                title={t("common.expand")}
               >
                 <ChevronsRight className="h-3.5 w-3.5" />
               </button>
@@ -323,13 +332,20 @@ export function Layout() {
                   ) : (
                     <Moon className="h-3.5 w-3.5" />
                   )}
-                  {dark ? "Light" : "Dark"}
+                  {dark ? t("layout.light") : t("layout.dark")}
                 </button>
                 <div className="flex items-center gap-1">
                   <button
+                    onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+                    className="p-1 text-muted-foreground hover:text-foreground rounded transition-colors"
+                    title={lang === "zh" ? t("layout.switchToEn") : t("layout.switchToZh")}
+                  >
+                    <Languages className="h-3.5 w-3.5" />
+                  </button>
+                  <button
                     onClick={() => setCollapsed(true)}
                     className="p-1 text-muted-foreground hover:text-foreground rounded transition-colors"
-                    title="Collapse"
+                    title={t("common.collapse")}
                   >
                     <ChevronsLeft className="h-3.5 w-3.5" />
                   </button>

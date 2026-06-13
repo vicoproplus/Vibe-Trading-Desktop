@@ -1,23 +1,40 @@
-export const METRIC_LABELS: Record<string, string> = {
-  total_return: "Total Return",
-  annual_return: "Annual",
-  sharpe: "Sharpe",
-  max_drawdown: "Max DD",
-  win_rate: "Win Rate",
-  trade_count: "Trades",
-  final_value: "Final Value",
-  calmar: "Calmar",
-  sortino: "Sortino",
-  profit_loss_ratio: "P/L Ratio",
-  max_consecutive_loss: "Max Consec. Loss",
-  avg_holding_days: "Avg Hold Days",
-  benchmark_return: "Benchmark",
-  excess_return: "Excess Return",
-  information_ratio: "IR",
+import type { Vars } from "@/i18n/types";
+
+export const METRIC_KEY_MAP: Record<string, string> = {
+  total_return: "charts.metrics.total_return",
+  annual_return: "charts.metrics.annual_return",
+  sharpe: "charts.metrics.sharpe",
+  max_drawdown: "charts.metrics.max_drawdown",
+  win_rate: "charts.metrics.win_rate",
+  trade_count: "charts.metrics.trade_count",
+  final_value: "charts.metrics.final_value",
+  calmar: "charts.metrics.calmar",
+  sortino: "charts.metrics.sortino",
+  profit_loss_ratio: "charts.metrics.profit_loss_ratio",
+  max_consecutive_loss: "charts.metrics.max_consecutive_loss",
+  avg_holding_days: "charts.metrics.avg_holding_days",
+  benchmark_return: "charts.metrics.benchmark_return",
+  excess_return: "charts.metrics.excess_return",
+  information_ratio: "charts.metrics.information_ratio",
+  annualized_return: "charts.metrics.annualized_return",
+  calmar_ratio: "charts.metrics.calmar_ratio",
+  sortino_ratio: "charts.metrics.sortino_ratio",
+  volatility: "charts.metrics.volatility",
+  profit_factor: "charts.metrics.profit_factor",
+  avg_win: "charts.metrics.avg_win",
+  avg_loss: "charts.metrics.avg_loss",
+  max_consecutive_losses: "charts.metrics.max_consecutive_losses",
+  exposure_time: "charts.metrics.exposure_time",
+  avg_holding_period: "charts.metrics.avg_holding_period",
 };
 
-export function getMetricLabel(k: string): string {
-  return METRIC_LABELS[k] || k;
+/** Resolve a metric key to its translated label via the provided loose translator (`tRaw`). */
+export function getMetricLabel(
+  k: string,
+  resolve: (path: string, vars?: Vars) => string,
+): string {
+  const path = METRIC_KEY_MAP[k];
+  return path ? resolve(path) : k;
 }
 
 const PCT_KEYS = ["total_return", "annual_return", "win_rate", "max_drawdown", "benchmark_return", "excess_return"];
@@ -51,9 +68,11 @@ export function metricSentiment(k: string, v: number): "positive" | "neutral" | 
 }
 
 export const DISPLAY_ORDER = [
-  "total_return", "annual_return", "sharpe", "max_drawdown", "win_rate", "trade_count",
-  "calmar", "sortino", "profit_loss_ratio", "max_consecutive_loss",
-  "benchmark_return", "excess_return", "information_ratio", "final_value", "avg_holding_days",
+  "total_return", "annualized_return", "sharpe", "max_drawdown", "volatility", "win_rate", "trade_count",
+  "calmar_ratio", "sortino_ratio", "profit_factor", "avg_win", "avg_loss",
+  "max_consecutive_losses", "exposure_time", "avg_holding_period",
+  "annual_return", "calmar", "sortino", "profit_loss_ratio", "max_consecutive_loss", "avg_holding_days",
+  "benchmark_return", "excess_return", "information_ratio", "final_value",
 ];
 
 export function formatTimestamp(ts: number): string {

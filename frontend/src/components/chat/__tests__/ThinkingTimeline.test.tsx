@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { LanguageProvider } from "@/i18n";
 import { ThinkingTimeline } from "../ThinkingTimeline";
 import type { AgentMessage } from "@/types/agent";
 
@@ -15,6 +16,11 @@ function makeMsg(overrides: Partial<AgentMessage> = {}): AgentMessage {
   };
 }
 
+function renderWithI18n(ui: React.ReactElement) {
+  localStorage.setItem("vibe-lang", "en");
+  return render(<LanguageProvider>{ui}</LanguageProvider>);
+}
+
 describe("ThinkingTimeline", () => {
   it("shows summary text when done", () => {
     const msgs: AgentMessage[] = [
@@ -28,7 +34,7 @@ describe("ThinkingTimeline", () => {
       }),
     ];
 
-    render(<ThinkingTimeline messages={msgs} />);
+    renderWithI18n(<ThinkingTimeline messages={msgs} />);
     expect(screen.getByText(/Done · 1 steps/)).toBeInTheDocument();
     expect(screen.getByText(/3\.2s/)).toBeInTheDocument();
   });
@@ -38,7 +44,7 @@ describe("ThinkingTimeline", () => {
       makeMsg({ type: "tool_call", tool: "run_backtest", status: "running" }),
     ];
 
-    render(<ThinkingTimeline messages={msgs} isLatest />);
+    renderWithI18n(<ThinkingTimeline messages={msgs} isLatest />);
     expect(screen.getByText(/Running Run backtest/)).toBeInTheDocument();
   });
 
@@ -49,7 +55,7 @@ describe("ThinkingTimeline", () => {
       makeMsg({ type: "tool_result", tool: "bash", status: "ok", elapsed_ms: 100, content: "output" }),
     ];
 
-    render(<ThinkingTimeline messages={msgs} />);
+    renderWithI18n(<ThinkingTimeline messages={msgs} />);
 
     // Initially collapsed
     expect(screen.queryByText("Run command")).not.toBeInTheDocument();
@@ -67,7 +73,7 @@ describe("ThinkingTimeline", () => {
       makeMsg({ type: "tool_result", tool: "bash", status: "error", content: "err" }),
     ];
 
-    render(<ThinkingTimeline messages={msgs} isLatest />);
+    renderWithI18n(<ThinkingTimeline messages={msgs} isLatest />);
     // Error state should be visible in summary
     expect(screen.getByText(/Done · 1 steps/)).toBeInTheDocument();
   });
@@ -78,7 +84,7 @@ describe("ThinkingTimeline", () => {
       makeMsg({ type: "thinking", content: "Let me analyze this strategy carefully." }),
     ];
 
-    render(<ThinkingTimeline messages={msgs} />);
+    renderWithI18n(<ThinkingTimeline messages={msgs} />);
 
     await user.click(screen.getByRole("button"));
     expect(screen.getByText("Let me analyze this strategy carefully.")).toBeInTheDocument();
@@ -90,7 +96,7 @@ describe("ThinkingTimeline", () => {
       makeMsg({ type: "tool_result", tool: "write_file", status: "ok", content: "ok" }),
     ];
 
-    render(<ThinkingTimeline messages={msgs} isLatest />);
+    renderWithI18n(<ThinkingTimeline messages={msgs} isLatest />);
     // Should be expanded immediately — "Generate code" label visible
     expect(screen.getByText("Generate code")).toBeInTheDocument();
   });
@@ -106,7 +112,7 @@ describe("ThinkingTimeline", () => {
       makeMsg({ type: "tool_result", tool: "run_backtest", status: "ok", elapsed_ms: 5000, content: "ok" }),
     ];
 
-    render(<ThinkingTimeline messages={msgs} />);
+    renderWithI18n(<ThinkingTimeline messages={msgs} />);
     expect(screen.getByText(/Done · 3 steps/)).toBeInTheDocument();
     expect(screen.getByText(/5\.7s/)).toBeInTheDocument();
 

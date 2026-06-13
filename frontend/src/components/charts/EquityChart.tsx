@@ -4,6 +4,7 @@ import { getChartTheme } from "@/lib/chart-theme";
 import { abbreviateNum } from "@/lib/formatters";
 import { echarts, CHART_GROUP, connectCharts } from "@/lib/echarts";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { useI18n } from "@/i18n";
 
 interface Props {
   data: EquityPoint[];
@@ -13,6 +14,7 @@ interface Props {
 export function EquityChart({ data, height = 300 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const { dark } = useDarkMode();
+  const { t: tr } = useI18n();
 
   useEffect(() => {
     if (!ref.current || data.length === 0) return;
@@ -49,8 +51,8 @@ export function EquityChart({ data, height = 300 }: Props) {
       },
       toolbox: {
         feature: {
-          saveAsImage: { title: "Save" },
-          restore: { title: "Reset" },
+          saveAsImage: { title: tr("charts.equity.save") },
+          restore: { title: tr("charts.equity.reset") },
         },
         right: 8, top: 0,
         iconStyle: { borderColor: t.textColor },
@@ -93,7 +95,7 @@ export function EquityChart({ data, height = 300 }: Props) {
           areaStyle: { color: t.downColor + "25" },
           markLine: {
             silent: true, symbol: "none",
-            data: [{ yAxis: minDD, label: { formatter: `Max DD: ${minDD}%`, position: "insideEndTop", fontSize: 10, color: t.downColor } }],
+            data: [{ yAxis: minDD, label: { formatter: `${tr("charts.equity.maxDrawdown")}: ${minDD}%`, position: "insideEndTop", fontSize: 10, color: t.downColor } }],
             lineStyle: { color: t.downColor, type: "dashed", width: 1 },
           },
         },
@@ -106,7 +108,7 @@ export function EquityChart({ data, height = 300 }: Props) {
   }, [data, dark]);
 
   if (data.length === 0) {
-    return <div className="text-muted-foreground text-sm p-4">No equity data</div>;
+    return <div className="text-muted-foreground text-sm p-4">{tr("charts.equity.noEquityData")}</div>;
   }
   return <div ref={ref} style={{ height }} />;
 }
