@@ -18,9 +18,9 @@
 
 ## 3. 可选依赖清单（registry）
 
-- [ ] 3.1 设计 `agent/src/optional_deps/registry.yaml` schema：券商/能力 → PyPI 包名 + 描述 + 平台 wheel 可用性标记 + 推荐镜像
-- [ ] 3.2 录入初始清单（至少：python-okx、futu-api、ib_async、longbridge、tigeropen、alpaca-py、dhanhq、shoonya、NorenRestApiPy、vnpy_ctp）
-- [ ] 3.3 实现 registry 加载模块（读取 + 校验包名白名单）
+- [x] 3.1 设计 `agent/src/optional_deps/registry.yaml` schema：券商/能力 → PyPI 包名 + 描述 + 平台 wheel 可用性标记 + 推荐镜像
+- [x] 3.2 录入初始清单（至少：python-okx、futu-api、ib_async、longbridge、tigeropen、alpaca-py、dhanhq、shoonya、NorenRestApiPy、vnpy_ctp）
+- [x] 3.3 实现 registry 加载模块（读取 + 校验包名白名单）
 
 ## 4. 后端安装/卸载/列表 API
 

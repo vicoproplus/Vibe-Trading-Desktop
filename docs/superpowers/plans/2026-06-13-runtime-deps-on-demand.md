@@ -507,7 +507,7 @@ git commit -s -m "feat(cli): inject VIBE_RUNTIME_LIBS into sys.path at import ti
 - Test: `agent/src/optional_deps/tests/__init__.py`
 - Test: `agent/src/optional_deps/tests/test_registry_loader.py`
 
-- [ ] **Step 1：创建包标记**
+- [x] **Step 1：创建包标记**
 
 新建 `agent/src/optional_deps/__init__.py`：
 
@@ -521,7 +521,7 @@ the FastAPI router mounted at ``/optional-deps`` by ``agent/api_server.py``.
 
 新建 `agent/src/optional_deps/tests/__init__.py`：（空文件）
 
-- [ ] **Step 2：写失败测试 — loader 加载 registry 并返回包名白名单**
+- [x] **Step 2：写失败测试 — loader 加载 registry 并返回包名白名单**
 
 新建 `agent/src/optional_deps/tests/test_registry_loader.py`：
 
@@ -615,12 +615,12 @@ def test_load_registry_rejects_missing_file(tmp_path):
         load_registry(tmp_path / "nope.yaml")
 ```
 
-- [ ] **Step 3：运行测试确认失败**
+- [x] **Step 3：运行测试确认失败**
 
 Run: `cd agent && python -m pytest src/optional_deps/tests/test_registry_loader.py -q`
 Expected: FAIL — `ModuleNotFoundError: No module named 'src.optional_deps.registry_loader'`。
 
-- [ ] **Step 4：创建 registry.yaml 初始清单**
+- [x] **Step 4：创建 registry.yaml 初始清单**
 
 新建 `agent/src/optional_deps/registry.yaml`：
 
@@ -687,7 +687,7 @@ brokers:
     recommended_mirror: tsinghua
 ```
 
-- [ ] **Step 5：实现 registry_loader.py**
+- [x] **Step 5：实现 registry_loader.py**
 
 新建 `agent/src/optional_deps/registry_loader.py`：
 
@@ -790,12 +790,12 @@ def package_whitelist(entries: List[RegistryEntry]) -> set[str]:
     return {e.package for e in entries}
 ```
 
-- [ ] **Step 6：运行测试确认通过**
+- [x] **Step 6：运行测试确认通过**
 
 Run: `cd agent && python -m pytest src/optional_deps/tests/test_registry_loader.py -q`
 Expected: PASS（4 个测试）。
 
-- [ ] **Step 7：提交**
+- [x] **Step 7：提交**
 
 ```bash
 git add agent/src/optional_deps/
