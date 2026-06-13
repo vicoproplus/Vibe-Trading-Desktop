@@ -5,10 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import pytest
 
 from src.optional_deps.installer import (
-    InstalledPackage,
     build_pip_args,
     scan_installed,
 )
@@ -17,7 +15,7 @@ from src.optional_deps.installer import (
 def _make_dist_info(libs: Path, name: str) -> None:
     d = libs / f"{name}.dist-info"
     d.mkdir(parents=True)
-    (d / "METADATA").write_text(f"Name: {name}\Version: 1.0\n", encoding="utf-8")
+    (d / "METADATA").write_text(f"Name: {name}\\Version: 1.0\n", encoding="utf-8")
 
 
 def test_scan_installed_returns_dist_info_names(tmp_path):

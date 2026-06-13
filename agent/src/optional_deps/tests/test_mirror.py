@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 from src.optional_deps.mirror import (
     DEFAULT_MIRROR,
