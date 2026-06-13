@@ -11,10 +11,10 @@
 
 ## 2. 包管理器选型与平台 wheel 探查 [spike]
 
-- [ ] 2.1 `[spike]` 验证 uv 是否支持 `--target <libs_dir>` 写入指定目录，以及内嵌 uv 的跨架构体积与是否需要联网自举
-- [ ] 2.2 `[spike]` 对照标准库 pip 的可用性与速度，作出 uv vs pip 的最终选型（决策门槛：uv `--target` 可用且 +20MB 可接受 → uv；否则 pip）
-- [ ] 2.3 `[spike]` 建立 10+ 券商 SDK 在 macOS arm64 / x86_64 / Windows 的预编译 wheel 可用性矩阵
-- [ ] 2.4 按选型将包管理器纳入 bundle（`resources.rs` 解析、`tauri.conf.json` 声明 resource）或确认标准库 pip 可用
+- [x] 2.1 `[spike]` 验证 uv 是否支持 `--target <libs_dir>` 写入指定目录，以及内嵌 uv 的跨架构体积与是否需要联网自举
+- [x] 2.2 `[spike]` 对照标准库 pip 的可用性与速度，作出 uv vs pip 的最终选型（决策门槛：uv `--target` 可用且 +20MB 可接受 → uv；否则 pip）
+- [x] 2.3 `[spike]` 建立 10+ 券商 SDK 在 macOS arm64 / x86_64 / Windows 的预编译 wheel 可用性矩阵
+- [x] 2.4 按选型将包管理器纳入 bundle（`resources.rs` 解析、`tauri.conf.json` 声明 resource）或确认标准库 pip 可用
 
 ## 3. 可选依赖清单（registry）
 
