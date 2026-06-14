@@ -103,7 +103,7 @@ pub enum Ready {
 pub fn await_health(child: &mut Child, port: u16) -> Ready {
     let url = format!("http://127.0.0.1:{port}/health");
     let client = reqwest::blocking::Client::new();
-    let deadline = Instant::now() + Duration::from_secs(60);
+    let deadline = Instant::now() + Duration::from_secs(120); // was 60; Python cold-start (pandas/scipy/duckdb) can exceed 60 s on first run
     while Instant::now() < deadline {
         if let Ok(Some(status)) = child.try_wait() {
             return Ready::ProcessExited(status.code());

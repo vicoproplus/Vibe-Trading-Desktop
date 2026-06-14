@@ -80,7 +80,7 @@ fn boot(
         sidecar::Ready::ProcessExited(code) =>
             Err(format!("后端进程提前退出(退出码 {code:?})。请检查依赖与配置。")),
         sidecar::Ready::Timeout =>
-            Err("后端在 60 秒内未就绪(健康检查超时)。".into()),
+            Err("后端在 120 秒内未就绪(健康检查超时)。".into()),
     }
 }
 
