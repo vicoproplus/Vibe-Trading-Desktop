@@ -73,11 +73,32 @@ function Invoke-Step1Runtime {
   Write-Host "Runtime ready at: $Runtime" -ForegroundColor Green
 }
 
+function Invoke-Step2Assemble {
+  Write-Step 2 "Assemble"
+  & "$DesktopScripts\assemble.ps1"
+  if ($LASTEXITCODE -ne 0) { throw "[FAILED] step 2: assemble exited $LASTEXITCODE" }
+  Write-Host "Assembly complete (.desktop-build populated)" -ForegroundColor Green
+}
+
+function Invoke-Step3Tauri {
+  Write-Step 3 "Tauri build"
+  Push-Location "$Root\src-tauri"
+  try {
+    cargo tauri build --bundles msi
+    if ($LASTEXITCODE -ne 0) { throw "[FAILED] step 3: cargo tauri build exited $LASTEXITCODE" }
+  } finally {
+    Pop-Location
+  }
+  Write-Host "MSI built at src-tauri/target/release/bundle/msi/" -ForegroundColor Green
+}
+
 # 主流程（后续 task 在此扩展）
 Push-Location $Root
 try {
   Invoke-Step0Checks
   Invoke-Step1Runtime
+  Invoke-Step2Assemble
+  Invoke-Step3Tauri
 } finally {
   Pop-Location
 }
