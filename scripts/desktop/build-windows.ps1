@@ -84,19 +84,19 @@ function Invoke-Step3Tauri {
   Write-Step 3 "Tauri build"
   Push-Location "$Root\src-tauri"
   try {
-    cargo tauri build --bundles msi
+    cargo tauri build --bundles nsis
     if ($LASTEXITCODE -ne 0) { throw "[FAILED] step 3: cargo tauri build exited $LASTEXITCODE" }
   } finally {
     Pop-Location
   }
-  Write-Host "MSI built at src-tauri/target/release/bundle/msi/" -ForegroundColor Green
+  Write-Host "Installer built at src-tauri/target/release/bundle/nsis/" -ForegroundColor Green
 }
 
 function Invoke-Step4Archive {
   Write-Step 4 "Archive"
-  $MsiGlob = "$Root\src-tauri\target\release\bundle\msi\*.msi"
-  $msiFiles = @(Get-ChildItem $MsiGlob -ErrorAction SilentlyContinue)
-  if ($msiFiles.Count -eq 0) { throw "no .msi found at $MsiGlob" }
+  $NsisGlob = "$Root\src-tauri\target\release\bundle\nsis\*.exe"
+  $nsisFiles = @(Get-ChildItem $NsisGlob -ErrorAction SilentlyContinue)
+  if ($nsisFiles.Count -eq 0) { throw "no installer found at $NsisGlob" }
 
   if (-not (Test-Path $OutputDir)) {
     New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
@@ -104,7 +104,7 @@ function Invoke-Step4Archive {
   $dest = (Resolve-Path $OutputDir).Path
 
   $sizeMB = 0
-  foreach ($f in $msiFiles) {
+  foreach ($f in $nsisFiles) {
     Copy-Item $f.FullName -Destination $dest -Force
     $copied = Join-Path $dest $f.Name
     $sizeMB = [math]::Round((Get-Item $copied).Length / 1MB, 1)
@@ -117,7 +117,7 @@ function Invoke-Step4Archive {
   Write-Host ""
   Write-Host "=== Build complete ===" -ForegroundColor Green
   Write-Host "  Output dir : $dest"
-  Write-Host "  MSI size   : $sizeMB MB"
+  Write-Host "  Installer   : $sizeMB MB"
   Write-Host "  Git HEAD   : $commit"
   Write-Host "  Tauri      : $tauriVer"
   Write-Host "  Elapsed    : $elapsed"
