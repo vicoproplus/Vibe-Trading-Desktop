@@ -1,9 +1,10 @@
 import i18n from "@/i18n";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Database, KeyRound, Loader2, RotateCcw, Save, Server, SlidersHorizontal } from "lucide-react";
+import { Database, KeyRound, Loader2, Package, RotateCcw, Save, Server, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { api, isAuthRequiredError, type DataSourceSettings, type LLMProviderOption, type LLMSettings } from "@/lib/api";
 import { getApiAuthKey, setApiAuthKey } from "@/lib/apiAuth";
+import { OptionalDepsManager } from "@/components/settings/OptionalDepsManager";
 
 interface LLMFormState {
   provider: string;
@@ -479,6 +480,18 @@ export function Settings() {
           </div>
         </div>
       </form>
+
+      {/* Desktop: optional broker SDK management */}
+      <section className="mt-6 rounded-xl border bg-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Package className="h-5 w-5" />
+          <h2 className="text-lg font-semibold">券商支持 (可选依赖)</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          按需安装券商 SDK。安装到本地可写目录，不影响核心依赖。
+        </p>
+        <OptionalDepsManager />
+      </section>
     </div>
   );
 }

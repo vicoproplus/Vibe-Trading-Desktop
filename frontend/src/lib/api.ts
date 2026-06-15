@@ -202,6 +202,29 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ broker }),
     }),
+
+  // Optional deps — on-demand broker SDK install (desktop runtime).
+  listOptionalDeps: () =>
+    request<OptionalDepsListResponse>("/optional-deps/list"),
+  installOptionalDep: (pkg: string) =>
+    request<{ job_id: string; status: string }>(
+      "/optional-deps/install",
+      { method: "POST", body: JSON.stringify({ package: pkg }) },
+    ),
+  uninstallOptionalDep: (pkg: string) =>
+    request<{ status: string }>(
+      "/optional-deps/uninstall",
+      { method: "POST", body: JSON.stringify({ package: pkg }) },
+    ),
+  optionalDepStatusUrl: (jobId: string) =>
+    withAuthQuery(`${BASE}/optional-deps/status/${encodeURIComponent(jobId)}`),
+  getOptionalDepsMirror: () =>
+    request<MirrorInfo>("/optional-deps/mirror"),
+  updateOptionalDepsMirror: (body: UpdateMirrorRequest) =>
+    request<MirrorInfo>("/optional-deps/mirror", {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
 };
 
 // --- Swarm types ---
@@ -908,6 +931,32 @@ export interface LiveRunnerResponse {
   already_running?: boolean;
   stopped?: boolean;
   was_running?: boolean;
+}
+
+export interface OptionalDepBroker {
+  id: string;
+  label: string;
+  package: string;
+  description: string;
+  platforms: string[];
+  recommended_mirror: string;
+  installed: boolean;
+  installed_version: string;
+}
+
+export interface OptionalDepsListResponse {
+  brokers: OptionalDepBroker[];
+}
+
+export interface MirrorInfo {
+  name: string;
+  custom_index_url: string;
+  available: Record<string, string>;
+}
+
+export interface UpdateMirrorRequest {
+  name: string;
+  custom_index_url?: string;
 }
 
 export interface MessageItem {

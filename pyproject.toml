@@ -116,6 +116,7 @@ pythonpath = ["agent"]
 markers = [
     "unit: Unit tests (fast, no network)",
     "integration: Integration tests (may need network)",
+    "optional_deps_integration: slow integration test that runs real pip",
 ]
 
 [tool.ruff]

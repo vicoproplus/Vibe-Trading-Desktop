@@ -5,17 +5,19 @@ import {
   formatTimestamp,
   abbreviateNum,
   DISPLAY_ORDER,
-  METRIC_LABELS,
+  METRIC_KEY_MAP,
 } from "../formatters";
 
 describe("getMetricLabel", () => {
+  const resolve = (p: string) => p; // identity for test
+
   it("returns human label for known keys", () => {
-    expect(getMetricLabel("sharpe")).toBe("Sharpe");
-    expect(getMetricLabel("max_drawdown")).toBe("Max DD");
+    expect(getMetricLabel("sharpe", resolve)).toBe("charts.metrics.sharpe");
+    expect(getMetricLabel("max_drawdown", resolve)).toBe("charts.metrics.max_drawdown");
   });
 
   it("returns raw key for unknown keys", () => {
-    expect(getMetricLabel("custom_metric")).toBe("custom_metric");
+    expect(getMetricLabel("custom_metric", resolve)).toBe("custom_metric");
   });
 });
 
@@ -150,8 +152,8 @@ describe("abbreviateNum", () => {
 });
 
 describe("DISPLAY_ORDER", () => {
-  it("contains all keys from METRIC_LABELS", () => {
-    const labelKeys = Object.keys(METRIC_LABELS);
+  it("contains all keys from METRIC_KEY_MAP", () => {
+    const labelKeys = Object.keys(METRIC_KEY_MAP);
     for (const key of labelKeys) {
       expect(DISPLAY_ORDER).toContain(key);
     }

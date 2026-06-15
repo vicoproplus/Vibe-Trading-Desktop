@@ -23,7 +23,9 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Request, Security, UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from rich.console import Console
@@ -114,7 +116,6 @@ class RunResponse(BaseModel):
     metrics: Optional[BacktestMetrics] = Field(None, description="Backtest metrics")
     artifacts: List[Artifact] = Field(default_factory=list, description="Run artifacts")
     run_card: Optional[Dict[str, Any]] = Field(None, description="Trust Layer run card payload")
-    llm_usage: Optional[Dict[str, Any]] = Field(None, description="Provider-reported AgentLoop usage summary")
 
     equity_curve: Optional[List[Dict[str, Any]]] = Field(None, description="Equity preview")
     trade_log: Optional[List[Dict[str, Any]]] = Field(None, description="Trade preview")
@@ -1026,15 +1027,7 @@ def _load_csv_to_dict(path: Path, limit: Optional[int] = None) -> List[Dict[str,
 
 
 
-def _build_response_from_run_dir(
-    run_dir: Path,
-    elapsed: float,
-    *,
-    include_analysis: bool = False,
-    chart_symbol: Optional[str] = None,
-    chart_payload: str = "full",
-    chart_symbols_out: Optional[List[str]] = None,
-) -> RunResponse:
+def _build_response_from_run_dir(run_dir: Path, elapsed: float, *, include_analysis: bool = False) -> RunResponse:
     """Build a run response from a persisted run directory."""
     run_id = run_dir.name
 
@@ -1124,13 +1117,6 @@ def _build_response_from_run_dir(
         except (json.JSONDecodeError, OSError):
             pass
 
-    llm_usage_path = run_dir / "llm_usage.json"
-    if llm_usage_path.exists():
-        try:
-            response.llm_usage = json.loads(llm_usage_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            pass
-
     trades_path = run_dir / "artifacts" / "trades.csv"
     if trades_path.exists():
         response.artifacts_trades_csv = _load_csv_to_dict(trades_path)
@@ -1159,14 +1145,7 @@ def _build_response_from_run_dir(
         response.trade_log = response.artifacts_trades_csv[:500]
 
     if include_analysis:
-        analysis = build_run_analysis(
-            run_dir,
-        symbols=[chart_symbol] if chart_symbol else None,
-        include_payload=chart_payload != "summary" or bool(chart_symbol),
-        include_symbol_list=chart_symbols_out is not None,
-    )
-        if chart_symbols_out is not None:
-            chart_symbols_out.extend(analysis.get("chart_symbols") or [])
+        analysis = build_run_analysis(run_dir)
         response.run_stage = analysis.get("run_stage")
         response.run_context = analysis.get("run_context")
         response.price_series = analysis.get("price_series")
@@ -1175,11 +1154,6 @@ def _build_response_from_run_dir(
         response.run_logs = analysis.get("run_logs")
 
     return response
-
-
-def _run_response_payload(response: RunResponse) -> Dict[str, Any]:
-    """Return a JSON-ready payload for opt-in run response variants."""
-    return response.model_dump(mode="json")
 
 
 # ============================================================================
@@ -1254,22 +1228,9 @@ async def get_run_pine(run_id: str):
 
 
 @app.get("/runs/{run_id}", response_model=RunResponse, dependencies=[Depends(require_auth)])
-async def get_run_result(
-    run_id: str,
-    chart_symbol: Optional[str] = Query(None, description="Opt in to chart payloads for a single symbol"),
-    chart_payload: Optional[str] = Query(
-        None,
-        description="Optional chart payload mode. Use 'summary' to omit chart rows and trade markers.",
-    ),
-):
-    """Fetch details for a historical run by ``run_id``.
-
-    The default response stays unchanged for existing consumers. Chart-heavy
-    optimizations are opt-in via query parameters.
-    """
+async def get_run_result(run_id: str):
+    """Fetch full details for a historical run by ``run_id``."""
     _validate_path_param(run_id, "run_id")
-    if chart_payload not in (None, "summary"):
-        raise HTTPException(status_code=400, detail="invalid chart_payload")
     run_dir = RUNS_DIR / run_id
 
     if not run_dir.exists():
@@ -1278,21 +1239,7 @@ async def get_run_result(
             detail=f"Run {run_id} not found"
         )
 
-    wants_chart_meta = bool(chart_payload or chart_symbol)
-    chart_symbols: List[str] = []
-    response = _build_response_from_run_dir(
-        run_dir,
-        elapsed=0.0,
-        include_analysis=True,
-        chart_symbol=chart_symbol,
-        chart_payload=chart_payload or "full",
-        chart_symbols_out=chart_symbols if wants_chart_meta else None,
-    )
-
-    if wants_chart_meta:
-        payload = _run_response_payload(response)
-        payload["chart_symbols"] = chart_symbols
-        return JSONResponse(payload)
+    response = _build_response_from_run_dir(run_dir, elapsed=0.0, include_analysis=True)
 
     return response
 
@@ -2331,6 +2278,18 @@ async def retry_swarm_run(run_id: str, http_request: Request):
 
 
 # ============================================================================
+# Optional deps — on-demand broker SDK install (desktop runtime)
+# ============================================================================
+# Mounted with the same loopback-or-auth gate as the other settings endpoints
+# so a non-local client must present API_AUTH_KEY to install packages.
+from src.optional_deps.api import router as optional_deps_router
+
+app.include_router(
+    optional_deps_router,
+    dependencies=[Depends(require_local_or_auth)],
+)
+
+# ============================================================================
 # Live trading channel — consent commit + kill switch
 # ============================================================================
 #
@@ -3124,24 +3083,51 @@ register_alpha_routes(app)
 # Main Entry Point
 # ============================================================================
 
+
+def _accept_header(scope: Dict[str, Any]) -> str:
+    """Read the ``Accept`` header from an ASGI scope (case-insensitive).
+
+    ASGI headers are a list of ``(bytes, bytes)`` tuples with lowercased keys.
+    Used by :class:`SPAStaticFiles` to tell browser navigation from API calls
+    on the 404 fallback path.
+    """
+    for key, value in scope.get("headers", []):
+        if key == b"accept":
+            return value.decode("latin-1", errors="replace")
+    return ""
+
+
+class SPAStaticFiles(StaticFiles):
+    """Serve index.html for browser refreshes on client-side routes.
+
+    On a 404 we only fall back to ``index.html`` when the caller is a
+    browser navigating to a client-side route (``Accept: text/html``).
+    Programmatic API callers (``Accept: application/json`` / ``*/*``) get a
+    clean JSON 404 instead — otherwise a stale backend missing an API
+    route (e.g. an older bundled agent) makes the frontend ``JSON.parse``
+    the SPA shell and surface an opaque "Unrecognized token '<'" error.
+    """
+
+    async def get_response(self, path: str, scope: Dict[str, Any]):
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as exc:
+            if exc.status_code != status.HTTP_404_NOT_FOUND:
+                raise
+            # Only browsers (Accept: text/html) get the SPA shell on a
+            # deep-link refresh; API callers get a JSON 404.
+            if "text/html" in _accept_header(scope):
+                return await super().get_response("index.html", scope)
+            return JSONResponse(
+                {"detail": "Not Found"}, status_code=status.HTTP_404_NOT_FOUND
+            )
+
+
 def serve_main(argv: list[str] | None = None) -> int:
     """Start the API server from CLI-style arguments."""
     import argparse
     import subprocess
     import uvicorn
-    from fastapi.staticfiles import StaticFiles
-    from starlette.exceptions import HTTPException as StarletteHTTPException
-
-    class SPAStaticFiles(StaticFiles):
-        """Serve index.html for browser refreshes on client-side routes."""
-
-        async def get_response(self, path: str, scope: Dict[str, Any]):
-            try:
-                return await super().get_response(path, scope)
-            except StarletteHTTPException as exc:
-                if exc.status_code != status.HTTP_404_NOT_FOUND:
-                    raise
-                return await super().get_response("index.html", scope)
 
     parser = argparse.ArgumentParser(description="Vibe-Trading Server")
     parser.add_argument("--port", type=int, default=8000, help="Listen port (default 8000)")
