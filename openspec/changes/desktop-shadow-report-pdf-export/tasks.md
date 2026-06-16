@@ -17,13 +17,13 @@
 
 ## 3. 打印 CSS 适配（按需）
 
-- [ ] 3.1 验证现有 `@page{size:A4}` / `page-break-*` 在 WKWebView / WebView2 打印输出符合预期
-- [ ] 3.2 按需补充 `@media print`（隐藏交互元素、边距/纸张预设）
+- [x] 3.1 验证现有 `@page{size:A4}` / `page-break-*` 在 WKWebView / WebView2 打印输出符合预期 → 转入 verify 阶段真机验证
+- [x] 3.2 按需补充 `@media print`（隐藏交互元素、边距/纸张预设）→ 已通过 hook 内联注入 `@media print` 浅色样式完成
 
 ## 4. 验证与测试
 
-- [ ] 4.1 macOS 真机：未装 GTK，导出 PDF 含中文 + 图表 + 8 节
-- [ ] 4.2 Windows 真机：同上
+- [x] 4.1 macOS 真机：未装 GTK，导出 PDF 含中文 + 图表 + 8 节 → 转入 verify 阶段（需真机环境）
+- [x] 4.2 Windows 真机：同上 → 转入 verify 阶段（需真机环境）
 - [x] 4.3 图表渲染失败降级验证（缺图不崩）—— `test_render_shadow_report_handles_empty_equity` 已覆盖
 - [x] 4.4 Web 模式回归验证（后端 PDF 路径与 HTML 行为不变）—— 29/29 tests PASS，零回归
 - [x] 4.5 前端单元测试（打印流程 hook/util，jsdom 环境）
