@@ -24,6 +24,6 @@
 
 - [ ] 4.1 macOS 真机：未装 GTK，导出 PDF 含中文 + 图表 + 8 节
 - [ ] 4.2 Windows 真机：同上
-- [ ] 4.3 图表渲染失败降级验证（缺图不崩）
-- [ ] 4.4 Web 模式回归验证（后端 PDF 路径与 HTML 行为不变）
+- [x] 4.3 图表渲染失败降级验证（缺图不崩）—— `test_render_shadow_report_handles_empty_equity` 已覆盖
+- [x] 4.4 Web 模式回归验证（后端 PDF 路径与 HTML 行为不变）—— 29/29 tests PASS，零回归
 - [x] 4.5 前端单元测试（打印流程 hook/util，jsdom 环境）
