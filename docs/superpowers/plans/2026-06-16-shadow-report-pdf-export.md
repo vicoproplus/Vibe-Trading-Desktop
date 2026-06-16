@@ -502,7 +502,7 @@ git commit -m "feat(frontend): add usePrintShadowReport hook for hidden iframe p
 **Files:**
 - Modify: `frontend/src/components/chat/RunCompleteCard.tsx`
 
-- [ ] **Step 1: 修改 RunCompleteCard.tsx 新增导出 PDF 按钮**
+- [x] **Step 1: 修改 RunCompleteCard.tsx 新增导出 PDF 按钮**
 
 打开 `frontend/src/components/chat/RunCompleteCard.tsx`：
 
@@ -556,7 +556,7 @@ const { exportPdf } = usePrintShadowReport(msg.shadowId ?? "");
           )}
 ```
 
-- [ ] **Step 2: 验证 TypeScript 编译**
+- [x] **Step 2: 验证 TypeScript 编译**
 
 ```bash
 cd /Users/niean/Documents/project/Vibe-Trading-Desktop/frontend
@@ -565,7 +565,7 @@ npx tsc -b --noEmit
 
 **Expected:** 无类型错误
 
-- [ ] **Step 3: 运行前端全量测试**
+- [x] **Step 3: 运行前端全量测试**
 
 ```bash
 cd /Users/niean/Documents/project/Vibe-Trading-Desktop/frontend
@@ -574,7 +574,7 @@ npx vitest run
 
 **Expected:** 全部 PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/src/components/chat/RunCompleteCard.tsx
