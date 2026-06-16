@@ -38,7 +38,7 @@ base-ref: eda460e99617609975e997aaabcaed056d9006aa
 - Modify: `agent/src/shadow_account/reporter.py:154-177`
 - Modify: `agent/tests/test_shadow_account.py`
 
-- [ ] **Step 1: 修改 `_render_charts` 启用 `embed_image_as_data_uri`**
+- [x] **Step 1: 修改 `_render_charts` 启用 `embed_image_as_data_uri`**
 
 打开 `agent/src/shadow_account/reporter.py`，定位到 `_render_charts` 函数第 176 行，将：
 
@@ -56,7 +56,7 @@ base-ref: eda460e99617609975e997aaabcaed056d9006aa
 
 确认 `embed_image_as_data_uri`（reporter.py:325）已在该文件顶部 `# ---------------- Convenience ----------------` 定义且可直接调用（同模块内部函数，无需 import）。
 
-- [ ] **Step 2: 编写后端单测 — 断言 data URI 前缀**
+- [x] **Step 2: 编写后端单测 — 断言 data URI 前缀**
 
 在 `agent/tests/test_shadow_account.py` 的 M4 Reporter 测试区域（`test_render_shadow_report_includes_today_signals` 之后，`test_render_shadow_report_handles_empty_equity` 之前）新增：
 
@@ -83,7 +83,7 @@ def test_render_charts_returns_data_uris(profitable_journal: Path, tmp_path: Pat
         )
 ```
 
-- [ ] **Step 3: 运行新增单测确认通过**
+- [x] **Step 3: 运行新增单测确认通过**
 
 ```bash
 cd /Users/niean/Documents/project/Vibe-Trading-Desktop
@@ -92,7 +92,7 @@ pytest agent/tests/test_shadow_account.py::test_render_charts_returns_data_uris 
 
 **Expected:** PASS
 
-- [ ] **Step 4: 运行全部 shadow account 测试确认无回归**
+- [x] **Step 4: 运行全部 shadow account 测试确认无回归**
 
 ```bash
 pytest agent/tests/test_shadow_account.py -v
@@ -100,7 +100,7 @@ pytest agent/tests/test_shadow_account.py -v
 
 **Expected:** 全部 PASS（13 个测试），特别关注 `test_render_shadow_report_emits_html` 和 `test_render_shadow_report_includes_today_signals` —— 它们走完整的 `render_shadow_report` → `_render_charts` 路径。
 
-- [ ] **Step 5: 验证 HTML 输出中图表已是 data URI（手动验证）**
+- [x] **Step 5: 验证 HTML 输出中图表已是 data URI（手动验证）**
 
 ```bash
 cd /Users/niean/Documents/project/Vibe-Trading-Desktop
