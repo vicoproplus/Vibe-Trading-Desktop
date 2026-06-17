@@ -210,6 +210,18 @@ vibe-trading --upload trades_export.csv
 vibe-trading run -p "Analyze my trading behavior, extract my shadow strategy, and compare it with my actual trades"
 ```
 
+## Desktop Releases
+
+Desktop installers are built from Git tags.
+
+```bash
+node scripts/desktop/sync-version.mjs 0.1.10
+git tag v0.1.10
+git push origin v0.1.10
+```
+
+That tag triggers GitHub Actions to build macOS and Windows installers and publish them as a release.
+
 ---
 
 ## 👥 Shadow Account
