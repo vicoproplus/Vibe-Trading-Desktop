@@ -16,3 +16,7 @@ Remove-Item $tmpReq
 
 Write-Host "Done. Checking weasyprint absent:"
 & $Py -m pip show weasyprint 2>&1; if ($LASTEXITCODE -ne 0) { Write-Host "weasyprint absent (OK)" }
+
+Write-Host "Running embedded runtime smoke checks"
+$env:PYTHONPATH = "agent"
+& $Py scripts\desktop\smoke_imports.py

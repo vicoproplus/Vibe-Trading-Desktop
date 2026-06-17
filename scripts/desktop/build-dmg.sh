@@ -132,8 +132,24 @@ if [ "$resources_ok" -ne 1 ]; then
     fi
 fi
 
+section "刷新桌面资源模板"
+log "bash scripts/desktop/assemble.sh"
+if ! bash "$ROOT/scripts/desktop/assemble.sh"; then
+    err "assemble.sh 失败。请先确认 python-runtime 已准备好。"
+    exit 2
+fi
+ok "agent / frontend / VERSION 资源模板已刷新"
+
 PY_VER="$("$PY_RUNTIME" --version 2>&1)"
 ok "运行时: $PY_VER"
+
+section "嵌入式 Python 冒烟检查"
+log "PYTHONPATH=agent $PY_RUNTIME scripts/desktop/smoke_imports.py"
+( cd "$ROOT" && PYTHONPATH=agent "$PY_RUNTIME" scripts/desktop/smoke_imports.py ) || {
+    err "嵌入式 Python 冒烟检查失败，请重新运行 install-deps.sh"
+    exit 2
+}
+ok "嵌入式 Python 冒烟检查通过"
 
 # ── 强制刷新 VERSION 标记 ─────────────────────────────────────
 # 每次构建必须生成唯一 VERSION，否则 runtime_dir::prepare() 会因版本

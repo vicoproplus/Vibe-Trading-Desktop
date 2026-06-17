@@ -44,6 +44,31 @@ def _is_crypto(code: str) -> bool:
 # Issue #50 — these symbols look like A-shares (.SH / .SZ) but stock_zh_a_hist
 # can't price them; route through fund_etf_hist_sina instead.
 _ETF_PREFIXES = frozenset({"15", "16", "50", "51", "52", "56", "58"})
+_FOREX_SYMBOL_FALLBACK = frozenset({
+    "AUDCAD",
+    "AUDCHF",
+    "AUDJPY",
+    "AUDUSD",
+    "CADCHF",
+    "CADJPY",
+    "CHFJPY",
+    "EURAUD",
+    "EURCAD",
+    "EURCHF",
+    "EURGBP",
+    "EURJPY",
+    "EURUSD",
+    "GBPAUD",
+    "GBPCAD",
+    "GBPCHF",
+    "GBPJPY",
+    "GBPUSD",
+    "NZDJPY",
+    "NZDUSD",
+    "USDCAD",
+    "USDCHF",
+    "USDJPY",
+})
 
 
 def _is_etf_listed(code: str) -> bool:
@@ -67,7 +92,7 @@ def _is_forex(code: str) -> bool:
     try:
         from akshare.forex.cons import symbol_market_map
     except Exception:
-        return False
+        return upper in _FOREX_SYMBOL_FALLBACK
     return upper in symbol_market_map
 
 
