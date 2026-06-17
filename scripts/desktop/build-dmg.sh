@@ -139,7 +139,11 @@ ok "运行时: $PY_VER"
 # 每次构建必须生成唯一 VERSION，否则 runtime_dir::prepare() 会因版本
 # 匹配而跳过 frontend/dist 刷新（Action::Reuse），导致新版客户端显示旧 UI。
 section "刷新 VERSION 标记"
-VERSION_NEW="$(cd "$ROOT" && git rev-parse --short HEAD)-$(date -u +%Y%m%d%H%M%S)"
+if [ -n "${DESKTOP_RELEASE_VERSION:-}" ]; then
+    VERSION_NEW="$DESKTOP_RELEASE_VERSION"
+else
+    VERSION_NEW="$(cd "$ROOT" && git rev-parse --short HEAD)-$(date -u +%Y%m%d%H%M%S)"
+fi
 echo "$VERSION_NEW" > "$BUILD/VERSION"
 ok "VERSION → $VERSION_NEW"
 

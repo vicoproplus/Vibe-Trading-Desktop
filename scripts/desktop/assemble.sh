@@ -43,10 +43,17 @@ if [ -f "$ROOT/agent/.env" ]; then cp "$ROOT/agent/.env" "$BUILD/agent/.env";
 elif [ -f "$ROOT/agent/.env.example" ]; then cp "$ROOT/agent/.env.example" "$BUILD/agent/.env";
 else : > "$BUILD/agent/.env"; fi
 
-# 6) VERSION 标记(取 git short sha + 构建时间戳，确保每次构建都触发前端刷新)
+# 6) VERSION 标记
 echo "=== Creating VERSION marker ==="
-VERSION_MARKER="$(cd "$ROOT" && git rev-parse --short HEAD)-$(date -u +%Y%m%d%H%M%S)"
+if [ -n "${DESKTOP_RELEASE_VERSION:-}" ]; then
+  VERSION_MARKER="$DESKTOP_RELEASE_VERSION"
+else
+  # Development builds use a unique marker so runtime_dir::prepare() refreshes
+  # bundled frontend/resources even when the installed semantic version matches.
+  VERSION_MARKER="$(cd "$ROOT" && git rev-parse --short HEAD)-$(date -u +%Y%m%d%H%M%S)"
+fi
 printf '%s\n' "$VERSION_MARKER" > "$BUILD/VERSION"
+echo "VERSION → $VERSION_MARKER"
 
 echo "=== Assembly complete ==="
 echo "Contents of $BUILD:"

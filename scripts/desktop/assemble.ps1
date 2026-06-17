@@ -40,7 +40,15 @@ else { New-Item -ItemType File -Path "$Build\agent\.env" | Out-Null }
 
 # 6) VERSION 标记
 Write-Host "=== Creating VERSION marker ==="
-(git -C $Root rev-parse --short HEAD) | Set-Content "$Build\VERSION"
+if ($env:DESKTOP_RELEASE_VERSION) {
+    $VersionMarker = $env:DESKTOP_RELEASE_VERSION
+} else {
+    $Commit = (git -C $Root rev-parse --short HEAD)
+    $Timestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddHHmmss")
+    $VersionMarker = "$Commit-$Timestamp"
+}
+$VersionMarker | Set-Content "$Build\VERSION"
+Write-Host "VERSION -> $VersionMarker"
 
 Write-Host "=== Assembly complete ==="
 Write-Host "Contents of ${Build}:"
