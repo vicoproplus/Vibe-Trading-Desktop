@@ -104,9 +104,10 @@ ashare = [
     # HTTP CDN IP blocks that affect eastmoney-backed sources. The Tencent
     # A-share loader needs no extra dependency (stdlib HTTP only).
     "baostock>=0.8.8",
-    # Optional TCP行情/F10 provider used by the standalone a-stock-data skill.
-    # Keep it optional because mootdx 0.11.x pins httpx<0.26 while the app
-    # runtime requires httpx>=0.28.
+]
+mootdx = [
+    # Optional TCP行情/F10 provider. Keep this separate from ``ashare`` because
+    # mootdx 0.11.x pins httpx<0.26 while the app runtime requires httpx>=0.28.
     "mootdx>=0.10",
 ]
 dev = [

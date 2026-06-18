@@ -3123,6 +3123,11 @@ class SPAStaticFiles(StaticFiles):
             )
 
 
+def _has_root_route(routes: Any) -> bool:
+    """Return whether a FastAPI/Starlette route collection already owns ``/``."""
+    return any(getattr(route, "path", None) == "/" for route in routes)
+
+
 def serve_main(argv: list[str] | None = None) -> int:
     """Start the API server from CLI-style arguments."""
     import argparse
@@ -3154,7 +3159,7 @@ def serve_main(argv: list[str] | None = None) -> int:
         print("[dev] Frontend: http://localhost:5173")
         print(f"[dev] API: http://localhost:{args.port}")
     elif frontend_dist.exists():
-        if not any(route.path == "/" for route in app.routes):
+        if not _has_root_route(app.routes):
             app.mount("/", SPAStaticFiles(directory=str(frontend_dist), html=True), name="frontend")
         print(f"[prod] Frontend served from {frontend_dist}")
     else:
