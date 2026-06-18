@@ -34,6 +34,7 @@ VALID_SOURCES: set[str] = {
     "tushare",
     "okx",
     "yfinance",
+    "a_stock_data",
     "akshare",
     "baostock",
     "tencent",
@@ -69,6 +70,7 @@ def _ensure_registered() -> None:
         "backtest.loaders.tushare",
         "backtest.loaders.okx",
         "backtest.loaders.yfinance_loader",
+        "backtest.loaders.a_stock_data",
         "backtest.loaders.akshare_loader",
         "backtest.loaders.baostock_loader",
         "backtest.loaders.tencent_loader",
@@ -89,7 +91,7 @@ def _ensure_registered() -> None:
 # ---------------------------------------------------------------------------
 
 FALLBACK_CHAINS: dict[str, list[str]] = {
-    "a_share":   ["tushare", "mootdx", "baostock", "tencent", "akshare"],
+    "a_share":   ["tushare", "mootdx", "baostock", "tencent", "a_stock_data", "akshare"],
     "us_equity": ["yfinance", "akshare"],
     "hk_equity": ["yfinance", "futu", "akshare"],
     "crypto":    ["okx", "ccxt", "yfinance"],

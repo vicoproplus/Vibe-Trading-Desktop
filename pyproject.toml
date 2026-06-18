@@ -44,6 +44,7 @@ dependencies = [
     "tushare>=1.2.89",
     "requests>=2.31.0",
     "yfinance>=0.2.30",
+    "stockstats>=0.6.0",
     "akshare>=1.12.0",
     "ccxt>=4.0.0",
     "fastapi>=0.104.0",
@@ -103,6 +104,11 @@ ashare = [
     # HTTP CDN IP blocks that affect eastmoney-backed sources. The Tencent
     # A-share loader needs no extra dependency (stdlib HTTP only).
     "baostock>=0.8.8",
+]
+mootdx = [
+    # Optional TCP行情/F10 provider. Keep this separate from ``ashare`` because
+    # mootdx 0.11.x pins httpx<0.26 while the app runtime requires httpx>=0.28.
+    "mootdx>=0.10",
 ]
 dev = [
     "pytest>=7.0",

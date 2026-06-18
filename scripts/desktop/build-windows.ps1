@@ -58,16 +58,16 @@ function Invoke-Step1Runtime {
   Write-Step 1 "Prepare runtime"
   $Runtime = "$Root\.desktop-build\python-runtime"
   if ($SkipRuntime) {
-    Write-Host "Skipping runtime rebuild (-SkipRuntime)" -ForegroundColor Yellow
+    Write-Host "Skipping runtime download (-SkipRuntime); dependencies will still be installed and smoked" -ForegroundColor Yellow
     if (-not (Test-Path "$Runtime\python.exe")) {
       throw "runtime missing at $Runtime but -SkipRuntime set; remove the flag or run fetch-runtime first"
     }
-    return
+  } else {
+    $env:PBS_TAG = $PbsTag
+    $env:PBS_ASSET = $PbsAsset
+    & "$DesktopScripts\fetch-runtime.ps1"
+    if ($LASTEXITCODE -ne 0) { throw "[FAILED] step 1: fetch-runtime exited $LASTEXITCODE" }
   }
-  $env:PBS_TAG = $PbsTag
-  $env:PBS_ASSET = $PbsAsset
-  & "$DesktopScripts\fetch-runtime.ps1"
-  if ($LASTEXITCODE -ne 0) { throw "[FAILED] step 1: fetch-runtime exited $LASTEXITCODE" }
   & "$DesktopScripts\install-deps.ps1" "$Runtime"
   if ($LASTEXITCODE -ne 0) { throw "[FAILED] step 1: install-deps exited $LASTEXITCODE" }
   Write-Host "Runtime ready at: $Runtime" -ForegroundColor Green

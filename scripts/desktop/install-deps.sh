@@ -17,3 +17,6 @@ uv pip install --python "$PY" -r "$tmp_req"
 rm -f "$tmp_req"
 echo "Done. Installed packages:"
 "$PY" -m pip list 2>/dev/null | head -40 || true
+
+echo "Running embedded runtime smoke checks"
+PYTHONPATH=agent "$PY" scripts/desktop/smoke_imports.py
