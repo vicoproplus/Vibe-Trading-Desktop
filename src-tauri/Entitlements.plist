@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Entitlements.plist — Hardened Runtime entitlements for Vibe Trading Desktop.
+
+  Notarization requires Hardened Runtime. The embedded Python sidecar needs these
+  exceptions to load its C extensions and the third-party packages it pip-installs
+  into ~/.vibe-trading/runtime/libs at first run:
+
+    - disable-library-validation : allow dlopen of .so/.dylib that are not signed
+      by the same Team ID (runtime-downloaded pip packages cannot be pre-signed)
+    - allow-jit / allow-unsigned-executable-memory : CPython's mmap-based memory
+      management and tracing allocators
+    - allow-dyld-environment-variables : PYTHONPATH / DYLD_* propagation to the
+      spawned sidecar process
+
+  App Sandbox is intentionally NOT enabled: the sidecar writes to arbitrary user
+  paths and dynamically loads runtime-installed packages, which cannot comply
+  with sandbox restrictions.
+-->
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+    <true/>
+</dict>
+</plist>

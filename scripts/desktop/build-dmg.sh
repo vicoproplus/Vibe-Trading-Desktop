@@ -22,7 +22,7 @@
 #   - 或直接运行本脚本会自动调用 assemble.sh 兜底
 #
 # 退出码：
-#   0 成功 / 1 工具缺失 / 2 资源缺失 / 3 构建失败 / 4 冒烟失败
+#   0 成功 / 1 工具缺失 / 2 资源缺失 / 3 构建失败 / 4 冒烟失败 / 5 签名/公证失败
 
 set -euo pipefail
 
@@ -239,6 +239,24 @@ if [ "$SKIP_SMOKE" -eq 0 ]; then
     done
 
     ok "冒烟检查全部通过"
+fi
+
+# ── 签名 + 公证（可选）──────────────────────────────────────
+# 检测到 APPLE_SIGNING_IDENTITY 即走完整 Developer ID 签名 + notarization；
+# 否则产物保持 ad-hoc 签名 —— 经浏览器下载分发到其他 Mac 会报"已损坏"。
+if [ -n "${APPLE_SIGNING_IDENTITY:-}" ]; then
+    section "签名 + 公证 (Developer ID)"
+    log "bash scripts/desktop/sign-and-notarize.sh"
+    if ! bash "$ROOT/scripts/desktop/sign-and-notarize.sh"; then
+        err "签名/公证失败"
+        exit 5
+    fi
+    ok "签名 + 公证完成"
+else
+    warn "未设置 APPLE_SIGNING_IDENTITY — 产物未签名/未公证（MVP 默认模式）。"
+    log "分发提示：用户从浏览器下载 DMG 后双击会报『已损坏』，请在 Release 说明里提供："
+    printf '    xattr -cr "/Applications/Vibe Trading.app"\n'
+    log "完整安装说明见 docs/desktop/README.md；购入 Apple 开发者账号后配置证书即可一键启用签名公证。"
 fi
 
 # ── 摘要 ─────────────────────────────────────────────────────
