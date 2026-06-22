@@ -556,5 +556,44 @@
   },
   "errorBoundary": {
     "somethingWrong": "Something went wrong"
+  },
+  "auth": {
+    "title": "Login / Register",
+    "subtitle": "First verification-code login creates your account automatically",
+    "phone": "Phone",
+    "captcha": "Captcha",
+    "refreshCaptcha": "Refresh captcha",
+    "smsCode": "SMS code",
+    "getCode": "Send code",
+    "countdown": "Resend in {{n}}s",
+    "smsSent": "Code sent",
+    "submit": "Login / Register",
+    "firstLoginHint": "First login registers your account",
+    "loginSuccess": "Logged in",
+    "errors": {
+      "captchaLoad": "Failed to load captcha",
+      "smsFailed": "Failed to send code",
+      "loginFailed": "Login failed"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "phone": "Phone",
+    "nickName": "Nickname",
+    "gender": "Gender",
+    "genderOptions": { "0": "Unknown", "1": "Male", "2": "Female" },
+    "description": "Bio",
+    "save": "Save",
+    "saved": "Saved",
+    "saveFailed": "Save failed",
+    "avatarUpdated": "Avatar updated",
+    "avatarFailed": "Avatar upload failed",
+    "logout": "Log out"
+  },
+  "userMenu": {
+    "login": "Login",
+    "profile": "Profile",
+    "logout": "Log out",
+    "guest": "Unnamed"
   }
 }

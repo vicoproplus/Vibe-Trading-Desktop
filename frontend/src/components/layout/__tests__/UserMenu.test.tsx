@@ -45,7 +45,7 @@ describe("UserMenu", () => {
     // 点击展开按钮
     const toggle = screen.getByRole("button");
     await userEvent.click(toggle);
-    // 下拉出现后应该有 logout 按钮（i18n key 为 userMenu.logout）
-    expect(screen.getByText("userMenu.logout")).toBeInTheDocument();
+    // 下拉出现后应该有 logout 按钮
+    expect(screen.getByText(/退出登录|Log out/)).toBeInTheDocument();
   });
 });

@@ -49,7 +49,7 @@ describe("Login page", () => {
     const captchaInput = screen.getByPlaceholderText("abcd");
     await userEvent.type(captchaInput, "9a8b");
     // send code button (i18n key "auth.getCode")
-    const sendBtn = screen.getByText("auth.getCode");
+    const sendBtn = screen.getByText(/获取验证码|Send code/);
     await userEvent.click(sendBtn);
 
     await waitFor(() => expect(sms).toHaveBeenCalledWith("13800000000", "c1", "9a8b"));
@@ -72,12 +72,15 @@ describe("Login page", () => {
     await userEvent.type(screen.getByPlaceholderText("13800000000"), "13800000000");
     await userEvent.type(screen.getByPlaceholderText("abcd"), "9a8b");
     // click send code
-    await userEvent.click(screen.getByText("auth.getCode"));
+    await userEvent.click(screen.getByText(/获取验证码|Send code/));
     await waitFor(() => expect(login).not.toHaveBeenCalled()); // still need sms code
 
     // type sms code
     await userEvent.type(screen.getByPlaceholderText("1234"), "1234");
-    await userEvent.click(screen.getByText("auth.submit"));
+    // click submit button (the one with type="button", not the h1)
+    const buttons = screen.getAllByRole("button");
+    const submitBtn = buttons.find((b) => b.textContent?.includes("登录")) || buttons[buttons.length - 1];
+    await userEvent.click(submitBtn);
 
     await waitFor(() => expect(login).toHaveBeenCalledWith("13800000000", "1234"));
     await waitFor(() => expect(person).toHaveBeenCalled());

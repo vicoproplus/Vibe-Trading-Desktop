@@ -33,10 +33,6 @@ export function setUserSessionTokens(token: string | null, refreshToken: string 
   _refreshToken = refreshToken;
 }
 
-function getToken() {
-  return _token;
-}
-
 export function __getRefreshTokenForTest() {
   return _refreshToken;
 }

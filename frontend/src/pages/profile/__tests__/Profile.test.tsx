@@ -43,13 +43,13 @@ describe("Profile page", () => {
     const input = screen.getByDisplayValue("Neo");
     await userEvent.clear(input);
     await userEvent.type(input, "Neo2");
-    await userEvent.click(screen.getByRole("button", { name: /profile.save/ }));
+    await userEvent.click(screen.getByRole("button", { name: /profile.save|保存/ }));
 
     await waitFor(() => expect(upd).toHaveBeenCalledWith(expect.objectContaining({ nickName: "Neo2" })));
   });
 
-  it("shows logout button", async () => {
+  it("shows logout button", () => {
     renderProfile();
-    await waitFor(() => expect(screen.getByText("profile.logout")).toBeInTheDocument());
+    expect(screen.getByText(/退出登录|Log out/)).toBeInTheDocument();
   });
 });

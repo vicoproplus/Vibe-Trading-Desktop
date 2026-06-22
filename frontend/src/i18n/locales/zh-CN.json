@@ -556,5 +556,44 @@
   },
   "errorBoundary": {
     "somethingWrong": "出了点问题"
+  },
+  "auth": {
+    "title": "登录 / 注册",
+    "subtitle": "首次验证码登录将自动注册账号",
+    "phone": "手机号",
+    "captcha": "图形验证码",
+    "refreshCaptcha": "刷新图形码",
+    "smsCode": "短信验证码",
+    "getCode": "获取验证码",
+    "countdown": "{{n}}s 后重发",
+    "smsSent": "验证码已发送",
+    "submit": "登录 / 注册",
+    "firstLoginHint": "首次验证码登录将自动注册",
+    "loginSuccess": "登录成功",
+    "errors": {
+      "captchaLoad": "图形验证码加载失败",
+      "smsFailed": "验证码发送失败",
+      "loginFailed": "登录失败"
+    }
+  },
+  "profile": {
+    "title": "个人信息",
+    "phone": "手机号",
+    "nickName": "昵称",
+    "gender": "性别",
+    "genderOptions": { "0": "未知", "1": "男", "2": "女" },
+    "description": "介绍",
+    "save": "保存",
+    "saved": "已保存",
+    "saveFailed": "保存失败",
+    "avatarUpdated": "头像已更新",
+    "avatarFailed": "头像上传失败",
+    "logout": "退出登录"
+  },
+  "userMenu": {
+    "login": "登录",
+    "profile": "个人信息",
+    "logout": "退出登录",
+    "guest": "未命名"
   }
 }

@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { api, type SessionItem } from "@/lib/api";
 import { useAgentStore } from "@/stores/agent";
 import { ConnectionBanner } from "@/components/layout/ConnectionBanner";
@@ -531,6 +532,9 @@ export function Layout() {
               </div>
             );
           })}
+        </div>
+        <div className="flex shrink-0 items-center pl-2">
+          <UserMenu />
         </div>
       </header>
 
