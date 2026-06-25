@@ -21,7 +21,10 @@ export function Login() {
   const fetchUserInfo = useAuthStore((s) => s.fetchUserInfo);
   const status = useAuthStore((s) => s.status);
 
-  const [captcha, setCaptcha] = useState<{ captchaId: string; data: string } | null>(null);
+  const [captcha, setCaptcha] = useState<{
+    captchaId: string;
+    data: string;
+  } | null>(null);
   const [phone, setPhone] = useState("");
   const [captchaCode, setCaptchaCode] = useState("");
   const [smsCode, setSmsCode] = useState("");
@@ -101,8 +104,12 @@ export function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-sm">
-        <h1 className="mb-1 text-xl font-semibold tracking-tight">{t("auth.title")}</h1>
-        <p className="mb-5 text-xs text-muted-foreground">{t("auth.subtitle")}</p>
+        <h1 className="mb-1 text-xl font-semibold tracking-tight">
+          {t("auth.title")}
+        </h1>
+        <p className="mb-5 text-xs text-muted-foreground">
+          {t("auth.subtitle")}
+        </p>
 
         <div className="space-y-4">
           <label className="grid gap-1.5">
@@ -110,7 +117,9 @@ export function Login() {
             <input
               className={fieldClass}
               value={phone}
-              onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
+              onChange={(e) =>
+                setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))
+              }
               placeholder="13800000000"
               inputMode="numeric"
             />
@@ -122,14 +131,16 @@ export function Login() {
               <input
                 className={fieldClass}
                 value={captchaCode}
-                onChange={(e) => setCaptchaCode(e.target.value.trim().slice(0, 4))}
+                onChange={(e) =>
+                  setCaptchaCode(e.target.value.trim().slice(0, 4))
+                }
                 placeholder="abcd"
               />
               <button
                 type="button"
                 onClick={loadCaptcha}
                 title={t("auth.refreshCaptcha")}
-                className="flex h-[38px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-md border bg-muted/30"
+                className="flex h-[38px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-md border bg-[#000]"
               >
                 {captcha ? (
                   <img
@@ -161,14 +172,18 @@ export function Login() {
               <button
                 type="button"
                 onClick={sendCode}
-                disabled={!phoneValid || !captchaValid || sending || countdown > 0}
+                disabled={
+                  !phoneValid || !captchaValid || sending || countdown > 0
+                }
                 className="inline-flex h-[38px] shrink-0 items-center justify-center gap-1 rounded-md border px-3 text-xs font-medium transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {countdown > 0
-                  ? t("auth.countdown", { n: countdown })
-                  : sending
-                    ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    : t("auth.getCode")}
+                {countdown > 0 ? (
+                  t("auth.countdown", { n: countdown })
+                ) : sending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  t("auth.getCode")
+                )}
               </button>
             </div>
           </label>
