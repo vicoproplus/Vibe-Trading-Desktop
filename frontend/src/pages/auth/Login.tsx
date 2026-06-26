@@ -5,6 +5,7 @@ import { Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { apiUser } from "@/lib/apiUser";
+import { api } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 
 const fieldClass =
@@ -13,6 +14,26 @@ const hintClass = "text-xs text-muted-foreground";
 
 const PHONE_RE = /^1\d{10}$/;
 const isCode4 = (s: string) => /^\d{4}$/.test(s) || /^[0-9a-zA-Z]{4}$/.test(s);
+
+/** 登录成功后自动配置 LLM 设置到 Maas 端点 */
+async function autoConfigLLM(token: string) {
+  try {
+    const userApiBase =
+      import.meta.env.VITE_USER_API_URL || "http://127.0.0.1:8001";
+    await api.updateLLMSettings({
+      provider: "openai",
+      model_name: "deepseek-v4-flash",
+      base_url: `https://maas.nieanshow.cn/v1`,
+      api_key: token,
+      temperature: 0,
+      timeout_seconds: 120,
+      max_retries: 2,
+      reasoning_effort: "",
+    });
+  } catch {
+    // 静默失败，不影响登录流程
+  }
+}
 
 export function Login() {
   const { t } = useTranslation();
@@ -91,6 +112,7 @@ export function Login() {
       const r = await apiUser.loginByPhone(phone, smsCode);
       setSession(r);
       await fetchUserInfo();
+      autoConfigLLM(r.token); // 不 await，静默配置
       toast.success(t("auth.loginSuccess"));
       navigate("/profile", { replace: true });
     } catch (e) {
@@ -140,7 +162,7 @@ export function Login() {
                 type="button"
                 onClick={loadCaptcha}
                 title={t("auth.refreshCaptcha")}
-                className="flex h-[38px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-md border bg-[#000]"
+                className="flex h-[38px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-md border bg-[#70634e]"
               >
                 {captcha ? (
                   <img
@@ -198,6 +220,14 @@ export function Login() {
             {t("auth.submit")}
           </button>
           <p className={hintClass}>{t("auth.firstLoginHint")}</p>
+
+          <button
+            type="button"
+            onClick={() => navigate("/", { replace: true })}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition hover:bg-muted"
+          >
+            {t("auth.backToHome")}
+          </button>
         </div>
       </div>
     </div>

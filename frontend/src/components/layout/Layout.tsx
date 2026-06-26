@@ -25,6 +25,7 @@ import {
   LineChart,
   Newspaper,
   Search,
+  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -247,6 +248,19 @@ export function Layout() {
               </Link>
             );
           })}
+          <a
+            href="https://agent.nieanshow.cn/column/04-ai-trading/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "flex items-center rounded-md text-sm transition-colors text-muted-foreground hover:bg-muted hover:text-foreground",
+              collapsed ? "justify-center p-2" : "gap-3 px-3 py-2"
+            )}
+            title={collapsed ? t("layout.docs") : undefined}
+          >
+            <BookOpen className="h-4 w-4 shrink-0" aria-hidden="true" />
+            {!collapsed && t("layout.docs")}
+          </a>
         </nav>
 
         {/* Sessions — hidden when collapsed */}

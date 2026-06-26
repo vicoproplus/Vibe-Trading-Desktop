@@ -26,6 +26,7 @@ export function Profile() {
   const [description, setDescription] = useState(userInfo?.description || "");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
 
   const save = async () => {
     setSaving(true);
@@ -57,7 +58,12 @@ export function Profile() {
   };
 
   const onLogout = () => {
+    setShowLogout(true);
+  };
+
+  const confirmLogout = () => {
     logout();
+    setShowLogout(false);
   };
 
   return (
@@ -148,6 +154,33 @@ export function Profile() {
           </div>
         </section>
       </div>
+
+      {/* Logout confirm dialog */}
+      {showLogout && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40" onClick={() => setShowLogout(false)} />
+          <div className="relative z-10 mx-4 w-full max-w-sm rounded-lg border bg-card p-6 shadow-lg">
+            <p className="text-sm font-medium">{t("profile.logoutConfirmTitle")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t("profile.logoutConfirmDesc")}</p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowLogout(false)}
+                className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm font-medium transition hover:bg-muted"
+              >
+                {t("layout.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={confirmLogout}
+                className="inline-flex items-center rounded-md bg-destructive px-3 py-1.5 text-sm font-medium text-destructive-foreground transition hover:opacity-90"
+              >
+                {t("layout.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

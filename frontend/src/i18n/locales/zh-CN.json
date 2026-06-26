@@ -15,6 +15,7 @@
     "alphaZoo": "Alpha 因子库",
     "settings": "设置",
     "correlation": "相关性矩阵",
+    "docs": "文档",
     "sessions": "会话",
     "newChat": "新建对话",
     "noSessions": "暂无会话",
@@ -740,6 +741,7 @@
     "smsSent": "验证码已发送",
     "submit": "登录 / 注册",
     "firstLoginHint": "首次验证码登录将自动注册",
+    "backToHome": "返回首页",
     "loginSuccess": "登录成功",
     "errors": {
       "captchaLoad": "图形验证码加载失败",
@@ -759,7 +761,9 @@
     "saveFailed": "保存失败",
     "avatarUpdated": "头像已更新",
     "avatarFailed": "头像上传失败",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "logoutConfirmTitle": "确认退出登录",
+    "logoutConfirmDesc": "退出后需要重新登录才能继续使用。"
   },
   "userMenu": {
     "login": "登录",

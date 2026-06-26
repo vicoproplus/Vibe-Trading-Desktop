@@ -1,10 +1,12 @@
 import i18n from "@/i18n";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Database, KeyRound, Loader2, Package, RotateCcw, Save, Server, SlidersHorizontal } from "lucide-react";
+import { Database, KeyRound, Loader2, LogIn, Package, RotateCcw, Save, Server, ShieldCheck, SlidersHorizontal, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { api, isAuthRequiredError, type DataSourceSettings, type LLMProviderOption, type LLMSettings } from "@/lib/api";
 import { getApiAuthKey, setApiAuthKey } from "@/lib/apiAuth";
 import { OptionalDepsManager } from "@/components/settings/OptionalDepsManager";
+import { useAuthStore } from "@/stores/auth";
+import { useNavigate } from "react-router-dom";
 
 interface LLMFormState {
   provider: string;
@@ -34,7 +36,7 @@ function toForm(settings: LLMSettings): LLMFormState {
 }
 
 export function Settings() {
-  
+
   const [settings, setSettings] = useState<LLMSettings | null>(null);
   const [dataSettings, setDataSettings] = useState<DataSourceSettings | null>(null);
   const [form, setForm] = useState<LLMFormState | null>(null);
@@ -47,6 +49,11 @@ export function Settings() {
   const [saving, setSaving] = useState(false);
   const [dataSaving, setDataSaving] = useState(false);
   const [settingsLoadError, setSettingsLoadError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+  const authStatus = useAuthStore((s) => s.status);
+  const userInfo = useAuthStore((s) => s.userInfo);
+  const isAuthenticated = authStatus === "authenticated";
 
   useEffect(() => {
     let alive = true;
@@ -229,181 +236,234 @@ export function Settings() {
 
       {localApiAccessSection}
 
-      <div className="space-y-2">
-        <h2 className="text-lg font-semibold tracking-tight">{"LLM Settings"}</h2>
-        <p className="max-w-3xl text-sm text-muted-foreground">{"Choose the model used by the agent and save it to the project-local agent/.env file."}</p>
-      </div>
+      {/* VIP 登录状态 / 登录引导 */}
+      {isAuthenticated ? (
+        <div className="rounded-lg border bg-card p-5 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
+              <ShieldCheck className="h-5 w-5 text-emerald-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base font-semibold">VIP 已激活</h2>
+                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600">
+                  已登录
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {userInfo?.nickName ? `${userInfo.nickName}，` : ""}LLM 已通过 VIP 服务自动配置为高速模型，无需手动设置。
+              </p>
+              <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                <Zap className="h-3.5 w-3.5 text-amber-500" />
+                <span>使用 Maas 加速端点 · deepseek-v4-flash</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-lg border bg-card p-5 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+              <Zap className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-base font-semibold">登录获取 VIP 模型加速</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                登录后自动配置高速 LLM 端点，无需手动填写 API Key 和模型参数。
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate("/login")}
+                className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+              >
+                <LogIn className="h-4 w-4" />
+                前往登录
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
-        <section className="rounded-lg border bg-card p-5 shadow-sm">
-          <div className="mb-5 flex items-center gap-2">
-            <Server className="h-4 w-4 text-primary" />
-            <h2 className="text-base font-semibold">{"Connection"}</h2>
+      {/* LLM Settings — 仅未登录时可见 */}
+      {!isAuthenticated && (
+        <>
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold tracking-tight">{"LLM Settings"}</h2>
+            <p className="max-w-3xl text-sm text-muted-foreground">{"Choose the model used by the agent and save it to the project-local agent/.env file."}</p>
           </div>
 
-          <div className="grid gap-4">
-            <label className="grid gap-2">
-              <span className={labelClass}>{i18n.t("settings.provider")}</span>
-              <select
-                value={form.provider}
-                onChange={(event) => onProviderChange(event.target.value)}
-                className={fieldClass}
-              >
-                {providers.map((provider) => (
-                  <option key={provider.name} value={provider.name}>{provider.label}</option>
-                ))}
-              </select>
-              <span className={hintClass}>{"Changing providers updates the recommended model and endpoint."}</span>
-            </label>
+          <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
+            <section className="rounded-lg border bg-card p-5 shadow-sm">
+              <div className="mb-5 flex items-center gap-2">
+                <Server className="h-4 w-4 text-primary" />
+                <h2 className="text-base font-semibold">{"Connection"}</h2>
+              </div>
 
-            <label className="grid gap-2">
-              <span className={labelClass}>{"Model"}</span>
-              <div className="flex gap-2">
-                <input
-                  value={form.model_name}
-                  onChange={(event) => setForm({ ...form, model_name: event.target.value })}
-                  className={fieldClass}
-                  required
-                />
+              <div className="grid gap-4">
+                <label className="grid gap-2">
+                  <span className={labelClass}>{i18n.t("settings.provider")}</span>
+                  <select
+                    value={form.provider}
+                    onChange={(event) => onProviderChange(event.target.value)}
+                    className={fieldClass}
+                  >
+                    {providers.map((provider) => (
+                      <option key={provider.name} value={provider.name}>{provider.label}</option>
+                    ))}
+                  </select>
+                  <span className={hintClass}>{"Changing providers updates the recommended model and endpoint."}</span>
+                </label>
+
+                <label className="grid gap-2">
+                  <span className={labelClass}>{"Model"}</span>
+                  <div className="flex gap-2">
+                    <input
+                      value={form.model_name}
+                      onChange={(event) => setForm({ ...form, model_name: event.target.value })}
+                      className={fieldClass}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => applyProviderDefaults()}
+                      className="inline-flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                      title={"Use provider defaults"}
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      <span className="hidden sm:inline">{"Use provider defaults"}</span>
+                    </button>
+                  </div>
+                  <span className={hintClass}>{"Use the exact model id required by your provider."}</span>
+                </label>
+
+                <label className="grid gap-2">
+                  <span className={labelClass}>{i18n.t("settings.baseUrl")}</span>
+                  <input
+                    value={form.base_url}
+                    onChange={(event) => setForm({ ...form, base_url: event.target.value })}
+                    className={fieldClass}
+                    placeholder={selectedProvider?.default_base_url}
+                    disabled={selectedProvider?.auth_type === "oauth"}
+                  />
+                </label>
+
+                <label className="grid gap-2">
+                  <span className={labelClass}>
+                    {selectedProvider?.auth_type === "oauth" ? "OAuth" : "API key"}
+                  </span>
+                  <div className="relative">
+                    <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="password"
+                      value={apiKey}
+                      onChange={(event) => setApiKey(event.target.value)}
+                      className={`${fieldClass} pl-9`}
+                      placeholder={keyStatus}
+                      autoComplete="current-password"
+                      disabled={apiKeyDisabled}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className={hintClass}>{keyStatus}</span>
+                    {selectedProvider?.api_key_required ? (
+                      <label className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                        <input
+                          type="checkbox"
+                          checked={clearApiKey}
+                          onChange={(event) => {
+                            setClearApiKey(event.target.checked);
+                            if (event.target.checked) setApiKey("");
+                          }}
+                          className="h-3.5 w-3.5 accent-primary"
+                        />
+                        {"Clear saved API key"}
+                      </label>
+                    ) : null}
+                  </div>
+                </label>
+              </div>
+            </section>
+
+            <section className="rounded-lg border bg-card p-5 shadow-sm">
+              <div className="mb-5 flex items-center gap-2">
+                <SlidersHorizontal className="h-4 w-4 text-primary" />
+                <h2 className="text-base font-semibold">{"Generation"}</h2>
+              </div>
+
+              <div className="grid gap-4">
+                <label className="grid gap-2">
+                  <span className={labelClass}>{i18n.t("settings.temperature")}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    value={form.temperature}
+                    onChange={(event) => setForm({ ...form, temperature: Number(event.target.value) })}
+                    className={fieldClass}
+                  />
+                </label>
+
+                <label className="grid gap-2">
+                  <span className={labelClass}>{i18n.t("settings.timeoutSeconds")}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={3600}
+                    step={1}
+                    value={form.timeout_seconds}
+                    onChange={(event) => setForm({ ...form, timeout_seconds: Number(event.target.value) })}
+                    className={fieldClass}
+                  />
+                </label>
+
+                <label className="grid gap-2">
+                  <span className={labelClass}>{"Max retries"}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={20}
+                    step={1}
+                    value={form.max_retries}
+                    onChange={(event) => setForm({ ...form, max_retries: Number(event.target.value) })}
+                    className={fieldClass}
+                  />
+                </label>
+
+                <label className="grid gap-2">
+                  <span className={labelClass}>{i18n.t("settings.reasoningEffort")}</span>
+                  <select
+                    value={form.reasoning_effort}
+                    onChange={(event) => setForm({ ...form, reasoning_effort: event.target.value })}
+                    className={fieldClass}
+                  >
+                    <option value="">{"Off"}</option>
+                    <option value="low">low</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                    <option value="max">max</option>
+                  </select>
+                  <span className={hintClass}>{"How hard the model thinks before answering. Higher is more thorough but slower; leave Off for fastest replies."}</span>
+                </label>
+
+                <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">{i18n.t("settings.saved")}: </span>
+                  <span className="break-all font-mono">{settings.env_path}</span>
+                </div>
+
                 <button
-                  type="button"
-                  onClick={() => applyProviderDefaults()}
-                  className="inline-flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                  title={"Use provider defaults"}
+                  type="submit"
+                  disabled={saving}
+                  className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  <RotateCcw className="h-4 w-4" />
-                  <span className="hidden sm:inline">{"Use provider defaults"}</span>
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  {saving ? i18n.t("settings.saving") : i18n.t("settings.save")}
                 </button>
               </div>
-              <span className={hintClass}>{"Use the exact model id required by your provider."}</span>
-            </label>
-
-            <label className="grid gap-2">
-              <span className={labelClass}>{i18n.t("settings.baseUrl")}</span>
-              <input
-                value={form.base_url}
-                onChange={(event) => setForm({ ...form, base_url: event.target.value })}
-                className={fieldClass}
-                placeholder={selectedProvider?.default_base_url}
-                disabled={selectedProvider?.auth_type === "oauth"}
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className={labelClass}>
-                {selectedProvider?.auth_type === "oauth" ? "OAuth" : "API key"}
-              </span>
-              <div className="relative">
-                <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(event) => setApiKey(event.target.value)}
-                  className={`${fieldClass} pl-9`}
-                  placeholder={keyStatus}
-                  autoComplete="current-password"
-                  disabled={apiKeyDisabled}
-                />
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className={hintClass}>{keyStatus}</span>
-                {selectedProvider?.api_key_required ? (
-                  <label className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
-                    <input
-                      type="checkbox"
-                      checked={clearApiKey}
-                      onChange={(event) => {
-                        setClearApiKey(event.target.checked);
-                        if (event.target.checked) setApiKey("");
-                      }}
-                      className="h-3.5 w-3.5 accent-primary"
-                    />
-                    {"Clear saved API key"}
-                  </label>
-                ) : null}
-              </div>
-            </label>
-          </div>
-        </section>
-
-        <section className="rounded-lg border bg-card p-5 shadow-sm">
-          <div className="mb-5 flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4 text-primary" />
-            <h2 className="text-base font-semibold">{"Generation"}</h2>
-          </div>
-
-          <div className="grid gap-4">
-            <label className="grid gap-2">
-              <span className={labelClass}>{i18n.t("settings.temperature")}</span>
-              <input
-                type="number"
-                min={0}
-                max={2}
-                step={0.1}
-                value={form.temperature}
-                onChange={(event) => setForm({ ...form, temperature: Number(event.target.value) })}
-                className={fieldClass}
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className={labelClass}>{i18n.t("settings.timeoutSeconds")}</span>
-              <input
-                type="number"
-                min={1}
-                max={3600}
-                step={1}
-                value={form.timeout_seconds}
-                onChange={(event) => setForm({ ...form, timeout_seconds: Number(event.target.value) })}
-                className={fieldClass}
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className={labelClass}>{"Max retries"}</span>
-              <input
-                type="number"
-                min={0}
-                max={20}
-                step={1}
-                value={form.max_retries}
-                onChange={(event) => setForm({ ...form, max_retries: Number(event.target.value) })}
-                className={fieldClass}
-              />
-            </label>
-
-            <label className="grid gap-2">
-              <span className={labelClass}>{i18n.t("settings.reasoningEffort")}</span>
-              <select
-                value={form.reasoning_effort}
-                onChange={(event) => setForm({ ...form, reasoning_effort: event.target.value })}
-                className={fieldClass}
-              >
-                <option value="">{"Off"}</option>
-                <option value="low">low</option>
-                <option value="medium">medium</option>
-                <option value="high">high</option>
-                <option value="max">max</option>
-              </select>
-              <span className={hintClass}>{"How hard the model thinks before answering. Higher is more thorough but slower; leave Off for fastest replies."}</span>
-            </label>
-
-            <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">{i18n.t("settings.saved")}: </span>
-              <span className="break-all font-mono">{settings.env_path}</span>
-            </div>
-
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              {saving ? i18n.t("settings.saving") : i18n.t("settings.save")}
-            </button>
-          </div>
-        </section>
-      </form>
+            </section>
+          </form>
+        </>
+      )}
 
       <form onSubmit={submitDataSources} className="rounded-lg border bg-card p-5 shadow-sm">
         <div className="mb-5 space-y-1">

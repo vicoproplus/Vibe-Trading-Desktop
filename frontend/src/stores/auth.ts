@@ -61,6 +61,21 @@ export const useAuthStore = create<AuthState>()(
       logout: (opts?: { silent?: boolean }) => {
         setUserSessionTokens(null, null);
         set({ token: null, refreshToken: null, expiresAt: null, userInfo: null, status: "guest" });
+
+        // 退出后恢复 LLM 为本地默认配置，清除 VIP token
+        import("@/lib/api").then(({ api }) =>
+          api.updateLLMSettings({
+            provider: "openai",
+            model_name: "gpt-4o",
+            base_url: "",
+            clear_api_key: true,
+            temperature: 0.7,
+            timeout_seconds: 120,
+            max_retries: 2,
+            reasoning_effort: "",
+          }).catch(() => { /* 静默：后端可能未就绪 */ })
+        );
+
         if (!opts?.silent) {
           // UI 层负责跳转与 toast；store 保持纯净
         }

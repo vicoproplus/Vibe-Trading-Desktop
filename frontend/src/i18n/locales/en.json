@@ -15,6 +15,7 @@
     "alphaZoo": "Alpha Zoo",
     "settings": "Settings",
     "correlation": "Correlation Matrix",
+    "docs": "Docs",
     "sessions": "Sessions",
     "newChat": "New Chat",
     "noSessions": "No sessions yet",
@@ -739,6 +740,7 @@
     "smsSent": "Code sent",
     "submit": "Login / Register",
     "firstLoginHint": "First login registers your account",
+    "backToHome": "Back to Home",
     "loginSuccess": "Logged in",
     "errors": {
       "captchaLoad": "Failed to load captcha",
@@ -758,7 +760,9 @@
     "saveFailed": "Save failed",
     "avatarUpdated": "Avatar updated",
     "avatarFailed": "Avatar upload failed",
-    "logout": "Log out"
+    "logout": "Log out",
+    "logoutConfirmTitle": "Confirm logout",
+    "logoutConfirmDesc": "You will need to log in again to continue using the app."
   },
   "userMenu": {
     "login": "Login",
