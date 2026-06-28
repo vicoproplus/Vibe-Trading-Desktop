@@ -1,5 +1,5 @@
 // frontend/src/lib/telemetry/consent.ts
-import { metaGet, metaSet } from "./db";
+import { metaSet } from "./db";
 
 const LS_KEY = "vibe_telemetry_consent";
 let _cache: boolean | null = null;

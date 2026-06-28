@@ -8,7 +8,7 @@ function uuidv4(): string {
     return crypto.randomUUID();
   }
   const b = new Uint8Array(16);
-  (crypto ?? (globalThis as any).msCrypto).getRandomValues(b);
+  (crypto as any).getRandomValues(b);
   b[6] = (b[6] & 0x0f) | 0x40;
   b[8] = (b[8] & 0x3f) | 0x80;
   const h = [...b].map((x) => x.toString(16).padStart(2, "0"));
