@@ -1701,6 +1701,16 @@ async def health_check():
     )
 
 
+@app.get("/telemetry/sidecar-metrics")
+async def telemetry_sidecar_metrics(since: float | None = None):
+    """本地同源聚合指标（§6.1）。无鉴权，仅回环访问。
+
+    返回自上次 snapshot 以来的增量并重置窗口；响应仅聚合数字。
+    """
+    from src.telemetry import counters  # 局部 import，避免启动期循环依赖
+    return counters.snapshot(since)
+
+
 @app.get("/correlation")
 async def get_correlation_matrix(
     codes: str = Query(..., description="Comma-separated asset codes, e.g. BTC-USDT,ETH-USDT,SPY"),
@@ -3473,15 +3483,15 @@ async def list_scheduled_runs(
 
 @app.delete(
     "/scheduled-runs/{job_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(require_auth)],
 )
-async def delete_scheduled_run(job_id: str) -> None:
+async def delete_scheduled_run(job_id: str):
     """Cancel (delete) a scheduled research job by id."""
     _validate_path_param(job_id, "job_id")
     removed = _get_scheduled_research_store().delete(job_id)
     if not removed:
         raise HTTPException(status_code=404, detail=f"scheduled run {job_id} not found")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 # ============================================================================
