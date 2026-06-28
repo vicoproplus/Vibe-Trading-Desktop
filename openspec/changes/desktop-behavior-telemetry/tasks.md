@@ -13,25 +13,25 @@
 
 - [x] 2.1 实现 IndexedDB 封装层（native，无依赖）：写入、按日期查询、删除、`purgeOld(days)`；附单测。
 - [x] 2.2 实现（匿名）设备 ID 的稳定生成与读取（localStorage `vibe_device_id`）。
-- [ ] 2.3 实现采集 SDK 核心 `track(type, props)`：consent off ⇒ no-op；白名单校验（type 枚举 + props 字段过滤）→ 写入当天桶。
+- [x] 2.3 实现采集 SDK 核心 `track(type, props)`：consent off ⇒ no-op；白名单校验（type 枚举 + props 字段过滤）→ 写入当天桶。
 - [ ] 2.4 接入关键 UI 埋点：路由切换、功能使用次数、会话起止/时长、前端错误（stack_hash）。
 
 ## 3. sidecar 脱敏指标与本地同源通道
 
-- [ ] 3.1 在 Python sidecar 实现进程内脱敏指标计数器（技能调用计数、回测次数/耗时/按引擎、错误计数及分类）。
-- [ ] 3.2 新增同源路由 `GET /telemetry/sidecar-metrics`（支持 `?since=` 增量），响应仅聚合数字、无内容字段。
-- [ ] 3.3 前端 flush 前拉取 sidecar 指标并入对应日期桶（best-effort，失败跳过）。
+- [x] 3.1 在 Python sidecar 实现进程内脱敏指标计数器（技能调用计数、回测次数/耗时/按引擎、错误计数及分类）。
+- [x] 3.2 新增同源路由 `GET /telemetry/sidecar-metrics`（支持 `?since=` 增量），响应仅聚合数字、无内容字段。
+- [x] 3.3 前端 flush 前拉取 sidecar 指标并入对应日期桶（best-effort，失败跳过）。
 
 ## 4. 隔天 flush 上传器
 
-- [ ] 4.1 实现 flush 调度：app 启动触发；扫描 `date < today(本地时区)` 批次，按日期升序；当天数据不传；同日多次启动不触发当日上传。
-- [ ] 4.2 实现上传：**独立 fetch**（非 apiUser.request），仅登录时附 `Authorization: Bearer <token>`，body 不含 user_id；2xx 删本地；失败指数退避（单批单启动 ≤3 次）。
+- [x] 4.1 实现 flush 调度：app 启动触发；扫描 `date < today(本地时区)` 批次，按日期升序；当天数据不传；同日多次启动不触发当日上传。
+- [x] 4.2 实现上传：**独立 fetch**（非 apiUser.request），仅登录时附 `Authorization: Bearer <token>`，body 不含 user_id；2xx 删本地；失败指数退避（单批单启动 ≤3 次）。
 - [x] 4.3 实现 14 天保留上限清理（`purgeOld(14)`）。
-- [ ] 4.4 consent 关闭后：停止新增采集，但已缓冲历史批次仍按计划上传一次。
+- [x] 4.4 consent 关闭后：停止新增采集，但已缓冲历史批次仍按计划上传一次。
 
 ## 5. Settings 同意开关
 
-- [ ] 5.1 Settings 页新增「使用数据」开关卡片（默认开启）+ 一句隐私说明 + i18n（zh-CN/en）。
+- [x] 5.1 Settings 页新增「使用数据」开关卡片（默认开启）+ 一句隐私说明 + i18n（zh-CN/en）。
 - [x] 5.2 开关状态持久化（meta + localStorage 双写）并接入采集层 gating。
 
 ## 6. 服务端端点（cool-admin-midway 跨仓）
