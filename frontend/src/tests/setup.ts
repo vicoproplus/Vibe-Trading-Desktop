@@ -29,3 +29,6 @@ if (typeof window !== "undefined") {
     }),
   });
 }
+
+// ── IndexedDB polyfill for telemetry tests ──────────────────
+import "fake-indexeddb/auto";
