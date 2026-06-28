@@ -14,7 +14,7 @@
 - [x] 2.1 实现 IndexedDB 封装层（native，无依赖）：写入、按日期查询、删除、`purgeOld(days)`；附单测。
 - [x] 2.2 实现（匿名）设备 ID 的稳定生成与读取（localStorage `vibe_device_id`）。
 - [x] 2.3 实现采集 SDK 核心 `track(type, props)`：consent off ⇒ no-op；白名单校验（type 枚举 + props 字段过滤）→ 写入当天桶。
-- [ ] 2.4 接入关键 UI 埋点：路由切换、功能使用次数、会话起止/时长、前端错误（stack_hash）。
+- [x] 2.4 接入关键 UI 埋点：路由切换、功能使用次数、会话起止/时长、前端错误（stack_hash）。
 
 ## 3. sidecar 脱敏指标与本地同源通道
 
@@ -36,15 +36,15 @@
 
 ## 6. 服务端端点（cool-admin-midway 跨仓）
 
-- [ ] 6.1 新增模块 `src/modules/telemetry/`：公开控制器 `controller/open/events.ts`（`@CoolController()` 免登，`@Post` 接收批次）。
-- [ ] 6.2 实现 `service/events.ts`：schema 校验（字段/类型/枚举/单批体积上限）、按 `device_id` 频控、token 有则解析盖戳 user_id（不信任 body user_id）。
-- [ ] 6.3 实现 `entity/event.ts`：`@Entity('telemetry_event') extends BaseEntity`，批次级字段（device_id/user_id?/batch_date/app_version/event_count/payload(JSON)/created_at）+ 落库。
-- [ ] 6.4 确认 cool-admin `open/` 路由前缀与契约路径一致；验证 CORS 覆盖该公开路由。
+- [x] 6.1 新增模块 `src/modules/telemetry/`：公开控制器 `controller/open/events.ts`（`@CoolController()` 免登，`@Post` 接收批次）。
+- [x] 6.2 实现 `service/events.ts`：schema 校验（字段/类型/枚举/单批体积上限）、按 `device_id` 频控、token 有则解析盖戳 user_id（不信任 body user_id）。
+- [x] 6.3 实现 `entity/event.ts`：`@Entity('telemetry_event') extends BaseEntity`，批次级字段（device_id/user_id?/batch_date/app_version/event_count/payload(JSON)/created_at）+ 落库。
+- [x] 6.4 确认 cool-admin `open/` 路由前缀与契约路径一致；验证 CORS 覆盖该公开路由。
 
 ## 7. 测试与隐私核验
 
-- [ ] 7.1 前端单测（vitest + fake-indexeddb）：白名单拒绝/剔除、按天分桶、flush 触发条件（同日多次启动不传）、失败退避（≤3）、14 天上限、consent gating（off⇒不写；历史仍传）、设备 ID 持久。
-- [ ] 7.2 sidecar 单测（pytest）：计数器正确、`/telemetry/sidecar-metrics` 形状与 `since` 增量、脱敏（无内容字段）。
-- [ ] 7.3 服务端单测（jest）：公开端点接收、匿名批次落库（user_id=null）、带 token 盖戳 user_id、伪造 body user_id 被忽略、schema 拒绝（400）、频控（429）。
-- [ ] 7.4 隐私核验：静态检查 `track()` 全部调用点 + 数据流，确认无 prompt/查询/交易内容进入事件。
+- [x] 7.1 前端单测（vitest + fake-indexeddb）：白名单拒绝/剔除、按天分桶、flush 触发条件（同日多次启动不传）、失败退避（≤3）、14 天上限、consent gating（off⇒不写；历史仍传）、设备 ID 持久。
+- [x] 7.2 sidecar 单测（pytest）：计数器正确、`/telemetry/sidecar-metrics` 形状与 `since` 增量、脱敏（无内容字段）。
+- [x] 7.3 服务端单测（jest）：公开端点接收、匿名批次落库（user_id=null）、带 token 盖戳 user_id、伪造 body user_id 被忽略、schema 拒绝（400）、频控（429）。
+- [x] 7.4 隐私核验：静态检查 `track()` 全部调用点 + 数据流，确认无 prompt/查询/交易内容进入事件。
 - [ ] 7.5 桌面端集成冒烟：模拟 Day1 采集（含未登录匿名）→ 改日期触发 Day2 flush → 验证 :8001 收到批次并落库、本地已删。
