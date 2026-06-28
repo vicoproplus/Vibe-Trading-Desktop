@@ -62,7 +62,7 @@ export async function deleteBucket(date: string): Promise<void> {
     const tx = db.transaction("events", "readwrite");
     const idx = tx.objectStore("events").index("date");
     const cur = idx.openCursor(IDBKeyRange.only(date));
-    cur.onsuccess = () => { const c = cur.result; if (!c) return resolve(); c.delete(); c.continue(); };
+    cur.onsuccess = () => { const c = cur.result; if (!c) return; c.delete(); c.continue(); };
     cur.onerror = () => reject(cur.error);
     tx.oncomplete = () => resolve();
   });
@@ -78,7 +78,7 @@ export async function purgeOld(days: number, todayFn: () => string = localToday)
     const tx = db.transaction("events", "readwrite");
     const idx = tx.objectStore("events").index("date");
     const cur = idx.openCursor(IDBKeyRange.upperBound(cutoff, true));
-    cur.onsuccess = () => { const c = cur.result; if (!c) return resolve(); deleted++; c.delete(); c.continue(); };
+    cur.onsuccess = () => { const c = cur.result; if (!c) return; deleted++; c.delete(); c.continue(); };
     cur.onerror = () => reject(cur.error);
     tx.oncomplete = () => resolve();
   });

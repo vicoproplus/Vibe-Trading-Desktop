@@ -32,16 +32,20 @@ export function __setBackoffMsForTest(ms: number[]): void {
 async function uploadOnce(batch: TelemetryBatch, token: string | null): Promise<number> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  const res = await fetch(_endpoint, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(batch),
-  });
-  if (res.ok) {
-    try { await res.json() as UploadResponse; } catch { /* ignore parse errors */ }
-    return 200;
+  try {
+    const res = await fetch(_endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(batch),
+    });
+    if (res.ok) {
+      try { await res.json() as UploadResponse; } catch { /* ignore parse errors */ }
+      return 200;
+    }
+    return res.status;
+  } catch {
+    return -1; // network error → retriable sentinel
   }
-  return res.status;
 }
 
 async function uploadBatchWithRetry(batch: TelemetryBatch, token: string | null): Promise<boolean> {
@@ -50,7 +54,7 @@ async function uploadBatchWithRetry(batch: TelemetryBatch, token: string | null)
     if (status === 200) return true;
     // 4xx (non-429): poison pill, discard
     if (status >= 400 && status < 500 && status !== 429) return true; // treated as handled
-    // 5xx / 429 / network error: backoff retry, max 3 retries
+    // 5xx / 429 / network error (-1): backoff retry, max 3 retries
     if (attempt < _backoff.length) {
       await new Promise((r) => setTimeout(r, _backoff[attempt]));
     } else {

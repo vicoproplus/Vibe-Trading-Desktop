@@ -579,8 +579,11 @@ async def _telemetry_error_middleware(request: Request, call_next):
         return await call_next(request)
     except Exception as exc:
         try:
-            from src.telemetry import counters  # noqa: PLC0415
-            counters.record_error(type(exc).__name__)
+            # Only count unexpected errors, not framework HTTP exceptions
+            from starlette.exceptions import HTTPException  # noqa: PLC0415
+            if not isinstance(exc, HTTPException):
+                from src.telemetry import counters  # noqa: PLC0415
+                counters.record_error(type(exc).__name__)
         except Exception:
             pass
         raise
