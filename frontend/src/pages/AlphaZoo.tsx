@@ -16,6 +16,7 @@ import i18n from '@/i18n';
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { track } from "@/lib/telemetry";
 import {
   Layers,
   Search,
@@ -117,6 +118,10 @@ function metaString(meta: Record<string, unknown>, key: string): string {
 export function AlphaZoo() {
   const params = useParams<{ alphaId?: string }>();
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    try { track("feature_use", {}, { name: "alpha_zoo_open" }); } catch {}
+  }, []);
 
   // Internal view selection
   if (pathname === "/alpha-zoo/bench") {

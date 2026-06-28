@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
+import { track } from "@/lib/telemetry";
 import {
   Activity,
   AlertTriangle,
@@ -26,6 +27,10 @@ export function Runtime() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try { track("feature_use", {}, { name: "runtime_open" }); } catch {}
+  }, []);
 
   const loadStatus = useCallback(async (mode: "initial" | "refresh" = "refresh") => {
     if (mode === "initial") setLoading(true);

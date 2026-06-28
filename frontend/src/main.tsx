@@ -7,6 +7,8 @@ import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { router } from "./router";
 import { useAuthStore } from "@/stores/auth";
 import { init as initTelemetry } from "@/lib/telemetry";
+import { track } from "@/lib/telemetry";
+import { hashStack } from "@/lib/telemetry/sanitize";
 import "highlight.js/styles/github-dark-dimmed.min.css";
 import "./index.css";
 
@@ -15,6 +17,11 @@ void useAuthStore.getState().bootstrap();
 
 // 触发隔天遥测数据 flush（非阻塞）
 initTelemetry();
+
+// 全局未捕获错误 → telemetry error 事件
+window.addEventListener("error", (e) => {
+  try { track("error", { type: e.error?.name ?? "Error", stack_hash: hashStack(e.error?.stack ?? "") }); } catch {}
+});
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

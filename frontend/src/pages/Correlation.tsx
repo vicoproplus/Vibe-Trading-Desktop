@@ -1,12 +1,17 @@
 import i18n from '@/i18n';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BarChart3 } from "lucide-react";
+import { track } from "@/lib/telemetry";
 import { CorrelationMatrix } from "@/components/charts/CorrelationMatrix";
 
 const WINDOWS = [30, 60, 90, 180, 365] as const;
 
 export function Correlation() {
   const [codes, setCodes] = useState("000001.SZ,600519.SH,000858.SZ,601318.SH");
+
+  useEffect(() => {
+    try { track("feature_use", {}, { name: "correlation_view" }); } catch {}
+  }, []);
   const [days, setDays] = useState<number>(90);
   const [method, setMethod] = useState<"pearson" | "spearman">("pearson");
   const [loading, setLoading] = useState(false);

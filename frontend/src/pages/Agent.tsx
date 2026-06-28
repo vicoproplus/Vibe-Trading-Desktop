@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, useMemo, useCallback, type FormEvent } fro
 import { useSearchParams } from "react-router-dom";
 import { Send, Loader2, ArrowDown, Square, Download, Plus, Paperclip, X, Users, Target, ChevronDown, Pencil, Check, Play, OctagonX, Activity, Ban, CheckCircle2, Landmark } from "lucide-react";
 import { toast } from "sonner";
+import { track } from "@/lib/telemetry";
 import { useAgentStore } from "@/stores/agent";
 import { useSSE } from "@/hooks/useSSE";
 import { ApiError, AUTH_REQUIRED_MESSAGE, api, isAuthRequiredError, type GoalSnapshot, type MandateProposal, type MandateCommitted, type LiveAction, type LiveHalted, type LiveStatus } from "@/lib/api";
@@ -876,6 +877,7 @@ export function Agent() {
         setupSSE(sid);
         const sent = await api.sendMessage(sid, kickoff);
         void syncCompletedAttempt(sid, sent.attempt_id);
+        try { track("feature_use", {}, { name: "chat_send" }); } catch {}
       } catch (error) {
         act().setStatus("idle");
         toast.error(error instanceof Error ? error.message : t('agent.failedToStartGoal'));
@@ -912,6 +914,7 @@ export function Agent() {
       setupSSE(sid);
       const sent = await api.sendMessage(sid, finalPrompt);
       void syncCompletedAttempt(sid, sent.attempt_id);
+      try { track("feature_use", {}, { name: "chat_send" }); } catch {}
     } catch (error) {
       act().setStatus("error");
       const message = isAuthRequiredError(error) ? AUTH_REQUIRED_MESSAGE : t('agent.failedToSend');

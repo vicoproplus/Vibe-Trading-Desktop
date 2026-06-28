@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { track } from "@/lib/telemetry";
 import {
   AlertTriangle,
   ArrowRight,
@@ -22,6 +23,10 @@ type SortMode = "created_desc" | "created_asc" | "return_desc" | "sharpe_desc";
 
 export function Reports() {
   const { t } = useTranslation();
+
+  useEffect(() => {
+    try { track("feature_use", {}, { name: "report_view" }); } catch {}
+  }, []);
   const [runs, setRuns] = useState<RunListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

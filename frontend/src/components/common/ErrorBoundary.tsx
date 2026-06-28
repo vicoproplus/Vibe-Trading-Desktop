@@ -1,6 +1,8 @@
 import i18n from "@/i18n";
 import { Component, type ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
+import { track } from "@/lib/telemetry";
+import { hashStack } from "@/lib/telemetry/sanitize";
 
 interface Props { children: ReactNode; fallback?: ReactNode; }
 interface State { hasError: boolean; error?: Error; }
@@ -9,6 +11,7 @@ export class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 
   static getDerivedStateFromError(error: Error): State {
+    try { track("error", { type: error.name || "Error", stack_hash: hashStack(error.stack ?? "") }); } catch {}
     return { hasError: true, error };
   }
 

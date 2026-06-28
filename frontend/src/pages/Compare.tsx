@@ -2,6 +2,7 @@ import i18n from '@/i18n';
 import { useEffect, useRef, useState } from "react";
 import { GitCompare, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/telemetry";
 import { api, type RunListItem, type RunData, type EquityPoint } from "@/lib/api";
 import { echarts, CHART_GROUP, connectCharts } from "@/lib/echarts";
 import { getChartTheme } from "@/lib/chart-theme";
@@ -199,6 +200,10 @@ function EquityChartOverlay({ leftCurve, rightCurve, leftLabel, rightLabel }: Eq
 
 export function Compare() {
   const [runs, setRuns] = useState<RunListItem[]>([]);
+
+  useEffect(() => {
+    try { track("feature_use", {}, { name: "compare_view" }); } catch {}
+  }, []);
   const [leftId, setLeftId] = useState("");
   const [rightId, setRightId] = useState("");
   const [leftData, setLeftData] = useState<Record<string, number> | null>(null);

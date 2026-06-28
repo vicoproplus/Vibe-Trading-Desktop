@@ -3,6 +3,7 @@ import { memo, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { BarChart3, Code2, FileText, Loader2, Printer } from "lucide-react";
 import { api } from "@/lib/api";
+import { track } from "@/lib/telemetry";
 import { AgentAvatar } from "./AgentAvatar";
 import { MetricsCard } from "./MetricsCard";
 import { MiniEquityChart } from "@/components/charts/MiniEquityChart";
@@ -109,7 +110,7 @@ export const RunCompleteCard = memo(function RunCompleteCard({ msg }: Props) {
                 Shadow Report
               </a>
               <button
-                onClick={(e) => { e.preventDefault(); exportPdf(); }}
+                onClick={(e) => { e.preventDefault(); exportPdf(); try { track("feature_use", {}, { name: "export_pdf" }); } catch {} }}
                 className="text-sm text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1.5 font-medium"
               >
                 <Printer className="h-3.5 w-3.5" />

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, Outlet, useLocation, useSearchParams } from "react-router-dom";
+import { track } from "@/lib/telemetry";
 import {
   Activity,
   BarChart3,
@@ -101,6 +102,21 @@ export function Layout() {
   ];
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
+
+  // ── telemetry: session_start, page_view, session_end ──
+  const startedAtRef = useRef(Date.now());
+  useEffect(() => {
+    try { track("session_start", {}); } catch {}
+    const onHide = () => {
+      try { track("session_end", { duration_ms: Date.now() - startedAtRef.current }); } catch {}
+    };
+    window.addEventListener("pagehide", onHide);
+    return () => window.removeEventListener("pagehide", onHide);
+  }, []);
+
+  useEffect(() => {
+    try { track("page_view", { route: pathname }); } catch {}
+  }, [pathname]);
   const { dark, toggle } = useDarkMode();
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
