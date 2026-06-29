@@ -738,6 +738,11 @@
     "title": "Login / Register",
     "subtitle": "First verification-code login creates your account automatically",
     "phone": "Phone",
+    "password": "Password",
+    "tab": {
+      "sms": "SMS login",
+      "password": "Password login"
+    },
     "captcha": "Captcha",
     "refreshCaptcha": "Refresh captcha",
     "smsCode": "SMS code",
@@ -751,7 +756,20 @@
     "errors": {
       "captchaLoad": "Failed to load captcha",
       "smsFailed": "Failed to send code",
-      "loginFailed": "Login failed"
+      "loginFailed": "Login failed",
+      "passwordLoginFailed": "Invalid phone or password"
+    },
+    "setPassword": {
+      "title": "Set login password",
+      "hint": "Set a password to log in with phone + password next time",
+      "new": "New password",
+      "confirm": "Confirm password",
+      "mismatch": "Passwords do not match",
+      "tooShort": "Password must be at least 6 characters",
+      "submit": "Set password",
+      "skip": "Skip",
+      "success": "Password set",
+      "failed": "Failed to set password"
     }
   },
   "profile": {
