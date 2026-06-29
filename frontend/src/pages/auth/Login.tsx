@@ -113,7 +113,7 @@ export function Login() {
   };
 
   const finishSession = async (
-    r: { token: string; refreshToken: string; expire: number; hasPassword: boolean },
+    r: { token: string; refreshToken: string; expire: number; refreshExpire: number; hasPassword: boolean },
     onFailRefreshCaptcha: boolean
   ) => {
     if (!r.hasPassword) {
