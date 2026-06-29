@@ -59,7 +59,7 @@ describe("Login page", () => {
     vi.spyOn(apiUser, "getCaptcha").mockResolvedValue({ captchaId: "c1", data: "<svg/>" });
     vi.spyOn(apiUser, "sendSmsCode").mockResolvedValue(undefined);
     const login = vi.spyOn(apiUser, "loginByPhone").mockResolvedValue({
-      token: "T", refreshToken: "R", expire: 3600, refreshExpire: 7200,
+      token: "T", refreshToken: "R", expire: 3600, refreshExpire: 7200, hasPassword: true,
     });
     const person = vi.spyOn(apiUser, "getPerson").mockResolvedValue({
       id: 1, nickName: "Neo", gender: 0, status: 1, loginType: 2,

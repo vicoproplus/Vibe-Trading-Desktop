@@ -22,6 +22,7 @@ export interface LoginResult {
   refreshToken: string;
   expire: number; // 秒
   refreshExpire: number; // 秒
+  hasPassword: boolean; // 是否已设置密码（首登引导设密码用）
 }
 
 export interface Captcha {
