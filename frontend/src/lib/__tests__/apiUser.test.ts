@@ -77,7 +77,7 @@ describe("apiUser — methods", () => {
   it("loginByPhone posts phone+smsCode and returns LoginResult", async () => {
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
-      .mockResolvedValue(json(1000, { token: "T", refreshToken: "R", expire: 1, refreshExpire: 2 }) as any);
+      .mockResolvedValue(json(1000, { token: "T", refreshToken: "R", expire: 1, refreshExpire: 2, hasPassword: true }) as any);
     const r = await apiUser.loginByPhone("13800000000", "1234");
     expect(r.token).toBe("T");
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
@@ -118,6 +118,30 @@ describe("apiUser — methods", () => {
     expect(JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string)).toEqual({
       phone: "13800000000", captchaId: "cid", code: "9a8b",
     });
+  });
+
+  it("loginByPassword posts phone+password and returns LoginResult", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(json(1000, { token: "T", refreshToken: "R", expire: 1, refreshExpire: 2, hasPassword: true }) as any);
+    const r = await apiUser.loginByPassword("13800000000", "secret123");
+    expect(r.token).toBe("T");
+    expect(r.hasPassword).toBe(true);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain("/app/user/login/password");
+    expect(init.method).toBe("POST");
+    expect(JSON.parse(init.body as string)).toEqual({ phone: "13800000000", password: "secret123" });
+  });
+
+  it("setPassword posts password to /app/user/info/setPassword", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(json(1000, null) as any);
+    await apiUser.setPassword("secret123");
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain("/app/user/info/setPassword");
+    expect(init.method).toBe("POST");
+    expect(JSON.parse(init.body as string)).toEqual({ password: "secret123" });
   });
 });
 

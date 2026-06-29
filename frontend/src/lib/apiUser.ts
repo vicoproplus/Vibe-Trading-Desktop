@@ -126,6 +126,13 @@ export const apiUser = {
     });
   },
 
+  loginByPassword(phone: string, password: string) {
+    return request<LoginResult>("/app/user/login/password", {
+      method: "POST",
+      body: JSON.stringify({ phone, password }),
+    });
+  },
+
   refreshToken(refreshToken: string) {
     return request<LoginResult>("/app/user/login/refreshToken", {
       method: "POST",
@@ -147,6 +154,13 @@ export const apiUser = {
     return request<UserInfo>("/app/user/info/updatePerson", {
       method: "POST",
       body: JSON.stringify(body),
+    });
+  },
+
+  setPassword(password: string) {
+    return request<void>("/app/user/info/setPassword", {
+      method: "POST",
+      body: JSON.stringify({ password }),
     });
   },
 
