@@ -35,14 +35,13 @@ export async function putEvent(e: Omit<StoredEvent, "id">): Promise<void> {
   db.close();
 }
 
-export async function getBucketsBefore(date: string): Promise<Record<string, TelemetryEvent[]>> {
+export async function getAllBuckets(): Promise<Record<string, TelemetryEvent[]>> {
   const db = await openDB();
   const out: Record<string, TelemetryEvent[]> = {};
   await new Promise<void>((resolve, reject) => {
     const tx = db.transaction("events", "readonly");
     const idx = tx.objectStore("events").index("date");
-    const range = IDBKeyRange.upperBound(date, true); // date < date (exclusive)
-    const cur = idx.openCursor(range);
+    const cur = idx.openCursor();
     cur.onsuccess = () => {
       const c = cur.result;
       if (!c) return resolve();
@@ -53,6 +52,16 @@ export async function getBucketsBefore(date: string): Promise<Record<string, Tel
     cur.onerror = () => reject(cur.error);
   });
   db.close();
+  return out;
+}
+
+export async function getBucketsBefore(date: string): Promise<Record<string, TelemetryEvent[]>> {
+  // ponytail: 内存过滤；数据量受 14 天 purge 上限约束，DB 层 range 无必要，复用 getAllBuckets 单份遍历
+  const all = await getAllBuckets();
+  const out: Record<string, TelemetryEvent[]> = {};
+  for (const [d, evs] of Object.entries(all)) {
+    if (d < date) out[d] = evs; // YYYY-MM-DD 字典序 = 日期序
+  }
   return out;
 }
 

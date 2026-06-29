@@ -48,6 +48,18 @@ describe("uploader", () => {
     vi.useRealTimers();
   });
 
+  it("forceAll uploads today's data too and returns counts (Settings test button)", async () => {
+    vi.setSystemTime(new Date(2026, 5, 28));
+    await putEvent({ ts: 1, type: "page_view", props: { route: "/a" }, date: "2026-06-28" }); // today
+    mockFetch(200);
+    const res = await flushNow({ forceAll: true });
+    expect(posted).toHaveLength(1);
+    expect(posted[0].body.batch_date).toBe("2026-06-28");
+    expect(res.uploaded).toBe(1);
+    expect(res.retained).toBe(0);
+    vi.useRealTimers();
+  });
+
   it("no Authorization when not logged in", async () => {
     vi.setSystemTime(new Date(2026, 5, 28));
     __setTokenGetterForTest(() => null);

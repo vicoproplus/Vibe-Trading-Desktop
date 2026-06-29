@@ -52,6 +52,11 @@
    - schema 校验 + 单批体积上限 + 按 device_id 频控 + 参数化查询防注入。
    - 跨仓实现，作为本 change 的任务（契约是两边缝合线）。
 
+9. **契约路径已确定：`/open/{module}/{file}/{method}`**
+   - cool-admin `@CoolController()` 前缀 = `{目录}/{模块}/{文件}`（open/app/admin 在最前）+ `@Post` 方法路径；`/open/` 不经鉴权中间件（`user/middleware/app.ts` 仅拦 `/app/`）⇒ 天然免登，匿名可用。
+   - telemetry 公开端点 = `/open/telemetry/events/events`；前端 uploader 默认 endpoint `${VITE_USER_API_BASE}/open/telemetry/events/events`。
+   - *曾误写 `/telemetry/open/...`（目录顺序错）导致 404，已修正。*
+
 ## Risks / Trade-offs
 
 - [Tauri command 通道贵] → 同源 HTTP 复用现成 sidecar，零新插件。
@@ -59,10 +64,9 @@
 - [公开端点被滥用/伪造 user_id] → schema 校验 + 体积上限 + device_id 频控 + 服务端盖戳（不信任 body user_id）。
 - [sidecar 不可用丢指标] → 非关键路径，best-effort。
 - [时区/时钟漂移] → 统一本地时区日期分桶，文档注明。
-- [cool-admin `open/` 路由前缀未定] → build 阶段对齐前缀，契约路径随后定。
+- [cool-admin `open/` 路由前缀未定] → ✅ 已解决（§Decision 9）：前缀 = `/open/{module}/{file}/{method}`，telemetry = `/open/telemetry/events/events`。
 
 ## Open Questions
 
-- cool-admin `open/` 控制器的确切路由前缀（决定契约路径）。
 - 频控实现选型（cool-admin 内置中间件 vs 进程内简单 cap）。
 - `app_version` 来源（Tauri 版本注入 vs 硬编码）。

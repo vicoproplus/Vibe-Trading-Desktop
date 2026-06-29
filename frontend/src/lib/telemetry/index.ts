@@ -1,6 +1,7 @@
 // frontend/src/lib/telemetry/index.ts
 export { track } from "./track";
 export { flushNow, setUploadEndpoint } from "./uploader";
+export type { FlushResult } from "./uploader";
 export { setConsent, getConsent } from "./consent";
 
 import { flushNow } from "./uploader";

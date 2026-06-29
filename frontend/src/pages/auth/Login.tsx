@@ -19,7 +19,7 @@ const isCode4 = (s: string) => /^\d{4}$/.test(s) || /^[0-9a-zA-Z]{4}$/.test(s);
 async function autoConfigLLM(token: string) {
   try {
     const userApiBase =
-      import.meta.env.VITE_USER_API_URL || "http://127.0.0.1:8001";
+      import.meta.env.VITE_USER_API_URL || "https://maas.nieanshow.cn";
     await api.updateLLMSettings({
       provider: "openai",
       model_name: "deepseek-v4-flash",

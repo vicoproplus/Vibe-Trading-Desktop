@@ -1,5 +1,5 @@
 // frontend/src/lib/telemetry/__tests__/db.test.ts
-import { openDB, putEvent, getBucketsBefore, deleteBucket, purgeOld, metaGet, metaSet } from "../db";
+import { openDB, putEvent, getBucketsBefore, getAllBuckets, deleteBucket, purgeOld, metaGet, metaSet } from "../db";
 
 beforeEach(async () => {
   const req = indexedDB.deleteDatabase("vibe_telemetry");
@@ -21,6 +21,13 @@ it("getBucketsBefore 不含当天及之后", async () => {
   const buckets = await getBucketsBefore("2026-06-28");
   expect(buckets["2026-06-27"]).toBeDefined();
   expect(buckets["2026-06-28"]).toBeUndefined();
+});
+
+it("getAllBuckets 返回全部日期含当天", async () => {
+  await putEvent({ ts: 1, type: "page_view", props: {}, date: "2026-06-27" });
+  await putEvent({ ts: 2, type: "page_view", props: {}, date: "2026-06-28" });
+  const all = await getAllBuckets();
+  expect(Object.keys(all).sort()).toEqual(["2026-06-27", "2026-06-28"]);
 });
 
 it("deleteBucket 删除指定日期", async () => {

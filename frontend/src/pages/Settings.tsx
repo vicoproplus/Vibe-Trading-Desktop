@@ -1,7 +1,7 @@
-import { getConsent, setConsent } from "@/lib/telemetry";
+import { getConsent, setConsent, flushNow } from "@/lib/telemetry";
 import i18n from "@/i18n";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Database, KeyRound, Loader2, LogIn, Package, RotateCcw, Save, Server, ShieldCheck, SlidersHorizontal, Zap } from "lucide-react";
+import { Database, KeyRound, Loader2, LogIn, Package, RotateCcw, Save, Server, ShieldCheck, SlidersHorizontal, Upload, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { api, isAuthRequiredError, type DataSourceSettings, type LLMProviderOption, type LLMSettings } from "@/lib/api";
 import { getApiAuthKey, setApiAuthKey } from "@/lib/apiAuth";
@@ -51,11 +51,31 @@ export function Settings() {
   const [dataSaving, setDataSaving] = useState(false);
   const [settingsLoadError, setSettingsLoadError] = useState<string | null>(null);
   const [usageDataOn, setUsageDataOn] = useState(getConsent());
+  const [flushing, setFlushing] = useState(false);
 
   const toggleUsageData = async (on: boolean) => {
     setUsageDataOn(on);
     await setConsent(on);
     toast.success(on ? i18n.t("settings.usageData.on") : i18n.t("settings.usageData.off"));
+  };
+
+  // 手动触发一次埋点上传（含当天），用于验证上传通路；正常流程是隔天启动自动 flush。
+  const handleTestUpload = async () => {
+    setFlushing(true);
+    try {
+      const { uploaded, retained } = await flushNow({ forceAll: true });
+      if (uploaded > 0) {
+        toast.success(`已上传 ${uploaded} 个埋点批次${retained ? `,${retained} 个保留重试` : ""}`);
+      } else if (retained > 0) {
+        toast.error(`上传失败,${retained} 个批次保留待重试`);
+      } else {
+        toast.info("没有待上传的埋点数据");
+      }
+    } catch (error) {
+      toast.error(`上传失败:${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setFlushing(false);
+    }
   };
 
   const navigate = useNavigate();
@@ -274,6 +294,15 @@ export function Settings() {
           </button>
         </div>
         <p className="text-sm text-muted-foreground">{i18n.t("settings.usageData.description")}</p>
+        <button
+          type="button"
+          onClick={handleTestUpload}
+          disabled={flushing}
+          className="mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {flushing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+          测试上传埋点数据
+        </button>
       </div>
 
       {/* VIP 登录状态 / 登录引导 */}
