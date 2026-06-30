@@ -1341,8 +1341,8 @@ def _build_typer_app():  # type: ignore[no-untyped-def]
 
     @app.command("serve", help="Start the FastAPI server.")
     def _serve(
-        host: str = typer.Option("0.0.0.0", "--host"),
-        port: int = typer.Option(8000, "--port"),
+        host: str = typer.Option("127.0.0.1", "--host"),
+        port: int = typer.Option(8899, "--port"),
         dev: bool = typer.Option(False, "--dev", help="Also boot the Vite dev server."),
     ) -> None:
         forwarded = ["serve", "--host", host, "--port", str(port)]

@@ -3567,8 +3567,8 @@ def serve_main(argv: list[str] | None = None) -> int:
     import uvicorn
 
     parser = argparse.ArgumentParser(description="Vibe-Trading Server")
-    parser.add_argument("--port", type=int, default=8000, help="Listen port (default 8000)")
-    parser.add_argument("--host", default="0.0.0.0", help="Bind address")
+    parser.add_argument("--port", type=int, default=8899, help="Listen port (default 8899)")
+    parser.add_argument("--host", default="127.0.0.1", help="Bind address")
     parser.add_argument("--dev", action="store_true", help="Dev mode: spawn Vite on :5173")
     try:
         args = parser.parse_args(argv)

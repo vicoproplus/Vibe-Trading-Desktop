@@ -89,6 +89,7 @@
 
 ```bash
 # 后端（API on :8899）
+python -m venv .venv
 pip install -e ".[dev]"
 vibe-trading serve
 
